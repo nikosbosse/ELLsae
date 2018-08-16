@@ -1,0 +1,6 @@
+useDynLib(ELLsae)
+import(RcppEigen)
+import(data.table)
+import(foreach)
+importFrom(Rcpp, evalCpp)
+exportPattern("^[[:alpha:]]+")

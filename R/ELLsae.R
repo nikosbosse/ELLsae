@@ -22,7 +22,7 @@
 
 ELLsae <- function(model, surveydata, censusdata, location_survey,
                     mResponse, location_census, n_boot = 50, welfare.function, test,
-                    parallel = T){
+                    parallel = F){
   
   
   # --------------------------------------------------------------------------------- #
@@ -49,7 +49,7 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
       stop("model must either be provided as a formula or as a string.
            See ?formula for help")
     }
-    }
+  }
   
   ##### check whether surveydata is specified correctly and try to correct
   if(missing(surveydata)) stop("Data frame with the surveydata is missing")
@@ -59,7 +59,7 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
       stop("survey data should be provided as data.table or something similar.
            ELLsae was not able to convert your input into a data.table")
     }
-    }
+  }
   n_obs_survey <- nrow(surveydata)
   if(!all( all.vars(model)[-1] %in%  names(surveydata))){
     stop("the model you provided specifies variables that are not included in the surveydata")
@@ -73,7 +73,7 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
       stop("census data should be provided as data.table or something similar.
            ELLsae was not able to convert your input into a data.table")
     }
-    }
+  }
   if(!all( all.vars(model)[-1] %in%  names(censusdata))){
     stop("the model you provided specifies variables that are not included in the censusdata")
   }
@@ -123,8 +123,6 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
               Means for variables will be added to the model for variables not originally present in the survey")
     }
     
-    
-    
     # compute means from census, add them to surveydata and update model
     new_var_names <- paste(vars_for_mean_calculation, "_meanCensus", sep="")
     censusdata[, c(new_var_names) := (lapply(.SD, mean)), by = c(location_census),
@@ -143,7 +141,7 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
                                    paste(new_var_names, collapse = " + "),
                                    sep = " + ")
     model <- as.formula(paste(model_left_hand_side, model_right_hand_side, sep = " ~ "))
-    }
+  }
   
   
   # --------------------------------------------------------------------------------- #
@@ -184,21 +182,19 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
   # - aggregates the predicted ys (or predicted welfare estimates)
   
   
-  # draw random location effects bootstrap sample
-  #if(n_boot > 50)
+  if(parallel == T){
+    no_cores <- parallel::detectCores() - 1
+    cl <- parallel::makeCluster(no_cores)
+    doParallel::registerDoParallel(cl)
+    parallel::stopCluster(cl)
+  }
   
-  
-  # if(parallel == T){
-  #   no_cores <- parallel::detectCores() - 1
-  #   cl <- parallel::makeCluster(no_cores)
-  #   doParallel::registerDoParallel(cl)
-  #   parallel::stopCluster(cl)
-  # }
   nsplit <- 5
+  classLocation_boot_list <- vector("list", nsplit)
   location_effect <- unique(surveydata$location_effect)
-  random_location_boot <- foreach::foreach(i=1:nsplit, .combine='cbind',  .packages=c("ELLsae", "Rcpp")) %do% ELLsae:::rddrawmatrixC(num_unique_elements = length(location_effect), # den Teil in C++ löschen
-                                                                                                                               n_bootstrap = n_boot/nsplit, n_obs_censusdata = n_obs_census,
-                                                                                                                               elements_to_draw_from = location_effect)
+  classLocation_boot_list <- foreach::foreach(i=1:nsplit, .packages=c("ELLsae", "Rcpp")) %do% ELLsae:::rddrawmatrixC(num_unique_elements = length(location_effect), # den Teil in C++ löschen
+                                                                                                                     n_bootstrap = n_boot/nsplit, n_obs_censusdata = n_obs_census,
+                                                                                                                     elements_to_draw_from = location_effect)
   
   
   

@@ -51,12 +51,34 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
     }
   }
   
+  ##### check whether the locations are specified correctly and try to correct
+  if(missing(location_survey)) stop("you have to provide either 1) a vector of locations of length corresponding to the number of observations in the survey data or 2) a string with the name of a variable in the surveydata that provides the locations of individual observations")
+  if (!(length(location_survey) == 1 & is.character(location_survey))) {
+    stop("you have to provide a string with the variable indicating the location in the survey data set")
+  }
+  if (!any(location_survey == names(surveydata))){
+    stop("String that was specified as variable name for the location is not the name of one of the variables in the survey data set.")
+  }
+  ### ACHTUNG ### wichtig das die locations vor dem survey-datensatz gescheckt werden und das
+  # falls es ein separater vektor ist, 
+  
   ##### check whether surveydata is specified correctly and try to correct
   if(missing(surveydata)) stop("Data frame with the surveydata is missing")
+  # important for the model.frame calculation
+  if(class(surveydata) != "data.frame"){
+    surveydata <- try(as.data.frame(surveydata), silent = T)
+    if (any(class(surveydata) == "try-error")){
+      stop("Survey data should be provided as data.frame or matrix.
+           ELLsae was not able to convert your input into a data.frame")
+    }
+  # reducing the data frame to only the model variables to save memory space and
+  # also use this for NA-handling
+  surveydata <- model.frame(formula = model,na.action = na.omit, data = surveydata)
+  # now the reduced data.frame will be transformed into a data.table object
   if(class(surveydata) != "data.table"){
     surveydata <- try(as.data.table(surveydata), silent = T)
     if (any(class(surveydata) == "try-error")){
-      stop("survey data should be provided as data.table or something similar.
+      stop("Survey data should be provided as data.frame or matrix.
            ELLsae was not able to convert your input into a data.table")
     }
   }
@@ -67,6 +89,17 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
   
   ##### check whether censusdata is specified correctly and try to correct
   if(missing(censusdata)) stop("Data frame with the censusdata is missing")
+  # important for the model.frame calculation
+  if(class(censusdata) != "data.frame"){
+    censusdata <- try(as.data.frame(censusdata), silent = T)
+    if (any(class(censusydata) == "try-error")){
+      stop("Census data should be provided as data.frame or matrix.
+           ELLsae was not able to convert your input into a data.frame")
+    }
+    # reducing the data frame to only the model variables to save memory space and
+    # also use this for NA-handling
+    censusdata <- model.frame(formula = model,na.action = na.omit, data = censusdata)
+    # now the reduced data.frame will be transformed into a data.table object
   if(class(censusdata) != "data.table"){ # alternativ if(!is.data.table(censusdata))?
     censusdata <- try(as.data.table(censusdata))
     if (any(class(censusdata) == "try-error")){
@@ -79,14 +112,7 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
   }
   n_obs_census <- nrow(censusdata)
   
-  ##### check whether the locations are specified correctly and try to correct
-  if(missing(location_survey)) stop("you have to provide either 1) a vector of locations of length corresponding to the number of observations in the survey data or 2) a string with the name of a variable in the surveydata that provides the locations of individual observations")
-  if (!(length(location_survey) == 1 & is.character(location_survey))) {
-    stop("you have to provide a string with the variable indicating the location in the survey data set")
-  }
-  if (!any(location_survey == names(surveydata))){
-    stop("String that was specified as variable name for the location is not the name of one of the variables in the survey data set.")
-  }
+  
   #### check if input for mResponse is valid and reformat
   if(!missing(mResponse)){
     # if mResponse is used we need a string with the census location
@@ -115,11 +141,11 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
            c) a \"\'.\'\" as string, indicating that you want to include the mean of all the variables in your model")
     }
     if(!all( mResponse %in%  names(censusdata))){
-      stop("your input for mResponse includes variables that are not present in the censusdata set.
+      stop("Your input for mResponse includes variables that are not present in the censusdata set.
            Means for those variables cannot be calculated")
     }
     if(!all( mResponse %in%  names(surveydata))){
-      warning("your input for mResponse includes variables that are not present in the surveydata set.
+      warning("Your input for mResponse includes variables that are not present in the surveydata set.
               Means for variables will be added to the model for variables not originally present in the survey")
     }
     
@@ -134,6 +160,9 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
     # make location_census in means_from_census equal to location_survey so they can be merged later on
     names(means_from_census)[names(means_from_census) == location_census] <- location_survey
     surveydata <- merge(surveydata, means_from_census, by = paste(location_survey), all.x = TRUE)
+    
+    # We save only save the necessary variables from the census data:
+    # censusdata <- censusdata[all.vars(model)[-1]]
     
     model.in.characters <- as.character(model)
     model_left_hand_side <- model.in.characters[2]

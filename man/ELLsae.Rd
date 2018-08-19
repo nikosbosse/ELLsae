@@ -2,10 +2,10 @@
 % Please edit documentation in R/ELLsae.R
 \name{ELLsae}
 \alias{ELLsae}
-\title{ELLsae}
+\title{Function for small area estimation}
 \usage{
 ELLsae(model, surveydata, censusdata, location_survey, mResponse,
-  location_census, n_boot = 50, welfare.function, test, parallel = T)
+  location_census, n_boot = 50, welfare.function, test, parallel = F)
 }
 \arguments{
 \item{model}{a model that is specified for the relationship betwenn
@@ -22,13 +22,32 @@ error correction and the location means (if \code{mResponse} is specified)}
 \item{mResponse}{Additional parameters for the regression based on location means
 calculated from the census data to account for the lack of information in a small survey}
 
-\item{n_boot}{Number of bootstrap samples used for the estimation, default is 50}
+\item{location_census}{name of location variable (string) in the census data which is used for
+error correction and location means. If \code{mResponse} is specified, but \code{location_census} 
+is missing}
+
+\item{n_boot}{Number of bootstrap samples used for the estimation, default is \code{n_boot = 50}}
 
 \item{welfare.function}{Additionally a welfare function for the response can be specified}
+
+\item{parallel}{indicates if compution is supposed to be done in parallel to improve speed}
 }
 \value{
-Was die Funktion ausspuckt.
+The function returns a vector of the imputed variable as well as ...
 }
 \description{
-Beschreibung der Funktion
+\code{ELLsae} is a method for small area estimation used to impute a missing variable 
+from a smaller survey dataset into a census. The imputation is based on a 
+linear model and bootstrap samples.
 }
+\examples{
+no examples are currently specified
+}
+\references{
+A
+}
+\seealso{
+Other SAE methods can also be found in the package \code{sae}.
+}
+\keyword{SAE}
+\keyword{imputation}

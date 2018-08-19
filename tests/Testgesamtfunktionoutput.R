@@ -2,8 +2,6 @@
 
 mod <-  hh_inc ~ age + urban + rooms + sex + religion + race + adults + children
 loc <- "geo2_br"
-y_true <- cens[,names(cens) == "hh_inc"]
-truemean <- mean(y_true)
 
 for(i in 100:101){
   set.seed(i)
@@ -19,8 +17,8 @@ for(i in 100:101){
       "meanresboot", mean(rowmeanC(y$resboot)), "\n",
       "difference y_pred - y_true", fit - truemean, "\n", "\n", sep = " ")
 }
-
-
+y_true <- cens[,names(cens) == "hh_inc"]
+truemean <- mean(y_true)
 
 
 library(profvis)

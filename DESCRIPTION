@@ -1,12 +1,21 @@
 Package: ELLsae
 Type: Package
-Title: What the package does (short line)
+Title: A Small Area Estimation Approach
 Version: 1.0
 Date: 2018-08-16
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Authors@R: c(person("Nikos", "Bosse", role = c("aut", "cre"),
+                     email = "nikos.bosse@stud.uni-goettingen.de"),
+              person("Felix.", "Suettmann", role = "aut",
+                     email = "felix.suettmann@stud.uni-goettingen.de"))
+Author: Nikos Bosse [aut, cre], 
+  Felix Suettmann [aut]
+Maintainer: Nikos Bosse <nikos.bosse@stud.uni-goettingen.de>
+Description: The method for small area estimation added by this package is largely based on an approach developed 
+  by C. Elbers, J. Lanjouw and P. Lanjouw (2003). It can be used to impute a missing variable 
+  from a smaller survey dataset into a census. The imputation is based on a 
+  linear model and bootstrap samples from a normal distribution. As of now the correction for heteroscedasticity 
+  is left omitted. 
+License: GPL-3
 Imports: Rcpp (>= 0.12.18), RcppEigen (>= 0.3.3.4.0), doParallel, foreach, data.table
 LinkingTo: Rcpp, RcppEigen
 SystemRequirements: C++11

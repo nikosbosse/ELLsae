@@ -1,23 +1,37 @@
-#' @title ELLsae
-#' @description Beschreibung der Funktion
+#' Function for small area estimation
 #'
-#' @param model a model that is specified for the relationship betwenn
-#' the response varibale and the regressors. Model must be a linear model that can be processed by \code{lm()}
-#' @param surveydata Smaller surveydata with additional response variable of interest.
-#' Will be used to estimate the linear model
-#' @param censusdata The dataset in which a certain variable is supposed to be imputed
-#' @param location_survey Name of location variable or vector for the survey data which is used for
-#' error correction and the location means (if \code{mResponse} is specified)
-#' @param mResponse Additional parameters for the regression based on location means
-#' calculated from the census data to account for the lack of information in a small survey
-#' @param n_boot Number of bootstrap samples used for the estimation, default is 50
-#' @param welfare.function Additionally a welfare function for the response can be specified
+#' \code{ELLsae} is a method for small area estimation used to impute a missing
+#' variable from a smaller survey dataset into a census. The imputation is based
+#' on a linear model and bootstrap samples.
+#'
+#' @param model a model that is specified for the relationship betwenn the
+#'   response varibale and the regressors. Model must be a linear model that can
+#'   be processed by \code{lm()}
+#' @param surveydata Smaller surveydata with additional response variable of
+#'   interest. Will be used to estimate the linear model
+#' @param censusdata The dataset in which a certain variable is supposed to be
+#'   imputed
+#' @param location_survey Name of location variable or vector for the survey
+#'   data which is used for error correction and the location means (if
+#'   \code{mResponse} is specified)
+#' @param mResponse Additional parameters for the regression based on location
+#'   means calculated from the census data to account for the lack of
+#'   information in a small survey
+#' @param location_census name of location variable (string) in the census data
+#'   which is used for error correction and location means. If \code{mResponse}
+#'   is specified, but \code{location_census} is missing
+#' @param n_boot Number of bootstrap samples used for the estimation, default is
+#'   \code{n_boot = 50}
+#' @param welfare.function Additionally a welfare function for the response can
+#'   be specified
+#' @param parallel indicates if compution is supposed to be done in parallel to
+#'   improve speed
 #' @export yes
-#' @return Was die Funktion ausspuckt.
-#' @references
-#' @seealso
-#' @keywords
-#' @examples
+#' @return The function returns a vector of the imputed variable as well as ...
+#' @references A
+#' @seealso Other SAE methods can also be found in the package \code{sae}.
+#' @keywords SAE imputation
+#' @examples no examples are currently specified
 
 
 ELLsae <- function(model, surveydata, censusdata, location_survey,
@@ -78,7 +92,7 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
   if(class(surveydata) != "data.table"){
     surveydata <- try(as.data.table(surveydata), silent = T)
     if (any(class(surveydata) == "try-error")){
-      stop("Survey data should be provided as data.frame or matrix.
+      stop("Survey data should be provided as data.table or something similar.
            ELLsae was not able to convert your input into a data.table")
     }
   }
@@ -89,17 +103,18 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
   
   ##### check whether censusdata is specified correctly and try to correct
   if(missing(censusdata)) stop("Data frame with the censusdata is missing")
-  # important for the model.frame calculation
-  if(class(censusdata) != "data.frame"){
-    censusdata <- try(as.data.frame(censusdata), silent = T)
-    if (any(class(censusydata) == "try-error")){
-      stop("Census data should be provided as data.frame or matrix.
-           ELLsae was not able to convert your input into a data.frame")
-    }
-    # reducing the data frame to only the model variables to save memory space and
-    # also use this for NA-handling
-    censusdata <- model.frame(formula = model,na.action = na.omit, data = censusdata)
-    # now the reduced data.frame will be transformed into a data.table object
+  # # important for the model.frame calculation
+  # if(class(censusdata) != "data.frame"){
+  #   censusdata <- try(as.data.frame(censusdata), silent = T)
+  #   if (any(class(censusydata) == "try-error")){
+  #     stop("Census data should be provided as data.frame or matrix.
+  #          ELLsae was not able to convert your input into a data.frame")
+  #   }
+  #   # reducing the data frame to only the model variables to save memory space and
+  #   # also use this for NA-handling
+  #   censusdata <- model.frame(formula = model,na.action = na.omit, data = censusdata)
+  # }
+  #   # now the reduced data.frame will be transformed into a data.table object
   if(class(censusdata) != "data.table"){ # alternativ if(!is.data.table(censusdata))?
     censusdata <- try(as.data.table(censusdata))
     if (any(class(censusdata) == "try-error")){
@@ -123,7 +138,8 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
         stop("if you want to use mResponse, you also have to provide a string indicating the name of the location variable in the census dataset.
              If the variable names are identical, one string for location_survey suffices.")
       }
-      }
+    }
+    # unique() %in% unique() 
     #### extract variables for which the mean is to be calculated
     if(mResponse == ".") {
       vars_for_mean_calculation <- all.vars(model)[-1]
@@ -139,6 +155,12 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
            a) string with the variables you want to include separated by \"+\" or \",\" or
            b) a character vector with your variables
            c) a \"\'.\'\" as string, indicating that you want to include the mean of all the variables in your model")
+    }
+    if(any(unique(surveydata[, location_survey]) != unique(censusdata[,location_census]))){
+      stop("Locations from the survey data must be nested in the census data")
+    }
+    if(any(is.na(surveydata[, location_survey]))){
+      stop("The locations are not allowed to have missing values")
     }
     if(!all( mResponse %in%  names(censusdata))){
       stop("Your input for mResponse includes variables that are not present in the censusdata set.
@@ -252,6 +274,7 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
   t <- terms.formula(model)
   t <- delete.response(t)
   X <- model.matrix(t, censusdata)
+  X <- na.omit(X)
   
   # X <- as.matrix(model.frame(t, censusdata))
   
@@ -300,4 +323,4 @@ ELLsae <- function(model, surveydata, censusdata, location_survey,
   
   
   return(result)
-    }
+}}

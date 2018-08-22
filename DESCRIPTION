@@ -16,8 +16,9 @@ Description: The method for small area estimation added by this package is large
   linear model and bootstrap samples from a normal distribution. As of now the correction for heteroscedasticity 
   is left omitted. 
 License: GPL-3
-Imports: Rcpp (>= 0.12.18), RcppEigen (>= 0.3.3.4.0), doParallel, foreach, data.table
-LinkingTo: Rcpp, RcppEigen
+LazyData: true
+Imports: Rcpp (>= 0.12.18), RcppEigen (>= 0.3.3.4.0), doParallel, foreach, data.table, bigstatsr, BH
+LinkingTo: Rcpp, RcppEigen, bigstatsr, BH
 SystemRequirements: C++11
 RoxygenNote: 6.1.0
 Suggests: testthat

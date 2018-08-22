@@ -2,14 +2,18 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 matrixmultiplicationC <- function(A, B) {
-    .Call('_ELLsae_matrixmultiplicationC', PACKAGE = 'ELLsae', A, B)
+    .Call(`_ELLsae_matrixmultiplicationC`, A, B)
 }
 
 rowmeanC <- function(x) {
-    .Call('_ELLsae_rowmeanC', PACKAGE = 'ELLsae', x)
+    .Call(`_ELLsae_rowmeanC`, x)
 }
 
-rddrawmatrixC <- function(num_unique_elements, n_bootstrap, elements_to_draw_from, n_obs_censusdata) {
-    .Call('_ELLsae_rddrawmatrixC', PACKAGE = 'ELLsae', num_unique_elements, n_bootstrap, elements_to_draw_from, n_obs_censusdata)
+inferenceCensusC <- function(n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample) {
+    .Call(`_ELLsae_inferenceCensusC`, n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample)
+}
+
+rowmeansBigC <- function(fbm) {
+    .Call(`_ELLsae_rowmeansBigC`, fbm)
 }
 

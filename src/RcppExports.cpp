@@ -7,19 +7,19 @@
 using namespace Rcpp;
 
 // matrixmultiplicationC
-SEXP matrixmultiplicationC(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd> B);
+SEXP matrixmultiplicationC(const Eigen::Map<Eigen::MatrixXd> A, const Eigen::Map<Eigen::MatrixXd> B);
 RcppExport SEXP _ELLsae_matrixmultiplicationC(SEXP ASEXP, SEXP BSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
-    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type B(BSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type B(BSEXP);
     rcpp_result_gen = Rcpp::wrap(matrixmultiplicationC(A, B));
     return rcpp_result_gen;
 END_RCPP
 }
 // rowmeanC
-NumericVector rowmeanC(NumericMatrix x);
+SEXP rowmeanC(NumericMatrix x);
 RcppExport SEXP _ELLsae_rowmeanC(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -29,17 +29,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rddrawmatrixC
-NumericMatrix rddrawmatrixC(int num_unique_elements, int n_bootstrap, NumericVector elements_to_draw_from, int n_obs_censusdata);
-RcppExport SEXP _ELLsae_rddrawmatrixC(SEXP num_unique_elementsSEXP, SEXP n_bootstrapSEXP, SEXP elements_to_draw_fromSEXP, SEXP n_obs_censusdataSEXP) {
+// inferenceCensusC
+SEXP inferenceCensusC(const int n_bootstrap, const int n_obs_censusdata, const Eigen::Map<Eigen::VectorXd> locationeffects, const Eigen::Map<Eigen::VectorXd> residuals, const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> beta_sample);
+RcppExport SEXP _ELLsae_inferenceCensusC(SEXP n_bootstrapSEXP, SEXP n_obs_censusdataSEXP, SEXP locationeffectsSEXP, SEXP residualsSEXP, SEXP XSEXP, SEXP beta_sampleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type num_unique_elements(num_unique_elementsSEXP);
-    Rcpp::traits::input_parameter< int >::type n_bootstrap(n_bootstrapSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type elements_to_draw_from(elements_to_draw_fromSEXP);
-    Rcpp::traits::input_parameter< int >::type n_obs_censusdata(n_obs_censusdataSEXP);
-    rcpp_result_gen = Rcpp::wrap(rddrawmatrixC(num_unique_elements, n_bootstrap, elements_to_draw_from, n_obs_censusdata));
+    Rcpp::traits::input_parameter< const int >::type n_bootstrap(n_bootstrapSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_obs_censusdata(n_obs_censusdataSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type locationeffects(locationeffectsSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type residuals(residualsSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type beta_sample(beta_sampleSEXP);
+    rcpp_result_gen = Rcpp::wrap(inferenceCensusC(n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rowmeansBigC
+NumericVector rowmeansBigC(Environment fbm);
+RcppExport SEXP _ELLsae_rowmeansBigC(SEXP fbmSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Environment >::type fbm(fbmSEXP);
+    rcpp_result_gen = Rcpp::wrap(rowmeansBigC(fbm));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -47,7 +60,8 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_ELLsae_matrixmultiplicationC", (DL_FUNC) &_ELLsae_matrixmultiplicationC, 2},
     {"_ELLsae_rowmeanC", (DL_FUNC) &_ELLsae_rowmeanC, 1},
-    {"_ELLsae_rddrawmatrixC", (DL_FUNC) &_ELLsae_rddrawmatrixC, 4},
+    {"_ELLsae_inferenceCensusC", (DL_FUNC) &_ELLsae_inferenceCensusC, 6},
+    {"_ELLsae_rowmeansBigC", (DL_FUNC) &_ELLsae_rowmeansBigC, 1},
     {NULL, NULL, 0}
 };
 

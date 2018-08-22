@@ -1,4 +1,4 @@
-useDynLib(ELLsae)
+useDynLib(ELLsae, .registration = TRUE)
 import(RcppEigen)
 import(data.table)
 import(foreach)

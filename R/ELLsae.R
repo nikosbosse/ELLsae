@@ -26,10 +26,11 @@
 #'   be specified
 #' @param parallel indicates if compution is supposed to be done in parallel to
 #'   improve speed
+#' @aliases sae, ELL, ellsae
 #' @export yes
 #' @return The function returns a vector of the imputed variable as well as ...
 #' @references A
-#' @seealso Other SAE methods can also be found in the package \code{sae}.
+#' @seealso Other SAE methods can also be found in the package \code{\link[sae]{}}}.
 #' @keywords SAE imputation
 #' @examples no examples are currently specified
 

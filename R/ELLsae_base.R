@@ -220,12 +220,15 @@ ELLsae <- function(model, transformy = F, surveydata, censusdata, location_surve
                            mu = coefficients(model_fit),
                            Sigma = vcov(summary(model_fit))))
 
-  
+  num_cores <- parallel::detectCores() - 3
+  # y_bootstrap <- ELLsae:::funD(n_bootstrap = n_boot, n_obs_censusdata = n_obs_census,
+  #                                           locationeffects = location_effect, 
+  #                                           residuals = residuals(model_fit),
+  #                                           X = X_census, beta_sample = betas, ncores = num_cores)
   y_bootstrap <- ELLsae:::inferenceCensusC(n_bootstrap = n_boot, n_obs_censusdata = n_obs_census,
-                                            locationeffects = location_effect, 
-                                            residuals = residuals(model_fit),
-                                            X = X_census, beta_sample = betas)
-  
+                               locationeffects = location_effect, 
+                               residuals = residuals(model_fit),
+                               X = X_census, beta_sample = betas)
   
   
   if(!missing(welfare.function)){
@@ -236,7 +239,7 @@ ELLsae <- function(model, transformy = F, surveydata, censusdata, location_surve
   }
   
   # result <- list()    
-  # if(output == "y"){
+  # if("y" %in% output){
   #   output$y <- rowmeanC(y_bootstrap)
   # }
   # 

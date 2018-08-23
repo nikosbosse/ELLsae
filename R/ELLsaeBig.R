@@ -81,6 +81,13 @@ ELLsaeBig <- function(model, surveydata, censusdata, location_survey,
   
   ##### check whether the locations are specified correctly and try to correct
   if(missing(location_survey)) stop("you have to provide either 1) a vector of locations of length corresponding to the number of observations in the survey data or 2) a string with the name of a variable in the surveydata that provides the locations of individual observations")
+  # this section checks for missing values in the locations and omitts the respective rows
+  # we still need is.na because if there are NAs in the census and survey locations the above does not
+  # fail!
+  if(any(is.na(surveydata[, location_survey]))){ 
+    warning("The locations are not allowed to have missing values. Rows with missing values are omitted") 
+    surveydata <- surveydata[!is.na(surveydata[, location_survey])]
+  } 
   if (!(length(location_survey) == 1 & is.character(location_survey))) {
     stop("you have to provide a string with the variable indicating the location in the survey data set")
   }
@@ -97,7 +104,14 @@ ELLsaeBig <- function(model, surveydata, censusdata, location_survey,
         stop("if you want to use mResponse, you also have to provide a string indicating the name of the location variable in the census dataset.
              If the variable names are identical, one string for location_survey suffices.")
       }
-      }
+    }
+    # checks if all the locations in the survey data are equal to those in the census. 
+    if(!all(unique(surveydata[, location_survey]) %in% unique(censusdata[,location_census]))){
+      stop("Locations from the survey data must be nested in the census data")
+    }
+    if(any(is.na(censusdata[, location_census]))){ 
+      stop("The locations in the census are not allowed to have missing values if location means are supposed to be computed.")
+    }
     #### extract variables for which the mean is to be calculated
     if(mResponse == ".") {
       vars_for_mean_calculation <- all.vars(model)[-1]

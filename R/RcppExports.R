@@ -9,10 +9,6 @@ inferenceCensusC <- function(n_bootstrap, n_obs_censusdata, locationeffects, res
     .Call(`_ELLsae_inferenceCensusC`, n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample)
 }
 
-summaryC <- function(x, nrow, ncol, quantiles) {
-    .Call(`_ELLsae_summaryC`, x, nrow, ncol, quantiles)
-}
-
 funD <- function(n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, ncores) {
     .Call(`_ELLsae_funD`, n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, ncores)
 }

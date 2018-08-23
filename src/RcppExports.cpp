@@ -33,20 +33,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// summaryC
-SEXP summaryC(const NumericMatrix& x, const int nrow, const int ncol, const NumericVector& quantiles);
-RcppExport SEXP _ELLsae_summaryC(SEXP xSEXP, SEXP nrowSEXP, SEXP ncolSEXP, SEXP quantilesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const NumericMatrix& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const int >::type nrow(nrowSEXP);
-    Rcpp::traits::input_parameter< const int >::type ncol(ncolSEXP);
-    Rcpp::traits::input_parameter< const NumericVector& >::type quantiles(quantilesSEXP);
-    rcpp_result_gen = Rcpp::wrap(summaryC(x, nrow, ncol, quantiles));
-    return rcpp_result_gen;
-END_RCPP
-}
 // funD
 Eigen::MatrixXd funD(const int n_bootstrap, const int n_obs_censusdata, const Eigen::Map<Eigen::VectorXd> locationeffects, const Eigen::Map<Eigen::VectorXd> residuals, const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> beta_sample, int ncores);
 RcppExport SEXP _ELLsae_funD(SEXP n_bootstrapSEXP, SEXP n_obs_censusdataSEXP, SEXP locationeffectsSEXP, SEXP residualsSEXP, SEXP XSEXP, SEXP beta_sampleSEXP, SEXP ncoresSEXP) {
@@ -108,7 +94,6 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_ELLsae_rowmeanC", (DL_FUNC) &_ELLsae_rowmeanC, 1},
     {"_ELLsae_inferenceCensusC", (DL_FUNC) &_ELLsae_inferenceCensusC, 6},
-    {"_ELLsae_summaryC", (DL_FUNC) &_ELLsae_summaryC, 4},
     {"_ELLsae_funD", (DL_FUNC) &_ELLsae_funD, 7},
     {"_ELLsae_funD2", (DL_FUNC) &_ELLsae_funD2, 7},
     {"_ELLsae_rowmeansBigC", (DL_FUNC) &_ELLsae_rowmeansBigC, 1},

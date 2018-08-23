@@ -47,64 +47,92 @@ SEXP rowmeanC(NumericMatrix x) {
 
 // [[Rcpp::export]]
 SEXP inferenceCensusC(const int n_bootstrap,
-                      const int n_obs_censusdata, 
-                      const Eigen::Map<Eigen::VectorXd> locationeffects, 
+                      const int n_obs_censusdata,
+                      const Eigen::Map<Eigen::VectorXd> locationeffects,
                       const Eigen::Map<Eigen::VectorXd> residuals,
-                      const Eigen::Map<Eigen::MatrixXd> X, 
+                      const Eigen::Map<Eigen::MatrixXd> X,
                       const Eigen::Map<Eigen::MatrixXd> beta_sample)
 {
-  
+
   // --------- create random sample of locations and of residuals --------- //
-  
-  // initialise random seeds 
+
+  // initialise random seeds
   std::random_device rd; // used to obtain a seed for the number engine
-  std::mt19937 gen(rd()); // Mersenne Twister engine 
+  std::mt19937 gen(rd()); // Mersenne Twister engine
 
   // initialize distributions for randam locations and residuals
   const int upperlocation = locationeffects.size();
   const int upperresiduals = residuals.size();
-  
+
   std::uniform_int_distribution<> distrloc(1, upperlocation);
   std::uniform_int_distribution<> distrres(1, upperresiduals);
-  
-  // initialize and fill matrix for randam locations and residuals 
+
+  // initialize and fill matrix for randam locations and residuals
   Eigen::MatrixXd LocationEffectResiduals(n_obs_censusdata, n_bootstrap);
 
   for (int i=0; i<n_obs_censusdata; ++i)
     for (int j=0; j<n_bootstrap; j++)
       LocationEffectResiduals(i,j) = locationeffects[distrloc(gen)-1] + residuals[distrres(gen)-1]; // subtract 1 because in C++ indices start with 0
-  
+
   // ----- create Xbeta ------- //
   Eigen::MatrixXd Xbeta = X * beta_sample;
 
   // ----- combine results ------- //
   Eigen::MatrixXd returnmatrix = Xbeta + LocationEffectResiduals;
-  
+
   return Rcpp::wrap(returnmatrix);
 }
 
-SEXP summaryC(const Eigen::Map<Eigen::MatrixXd> x, 
-              const int nrow, const int ncol,
-              const Eigen::Map<Eigen::VectorXd> quantiles)
-{
-  Eigen::MatrixXd result;
 
-  for(int i = 0; i < nrow; i++){
-    double total = 0;
-    for (int j = 0, j < ncol; j++){
-      total += x(i,j);
-      result(i,1)
-      result(i,0)
-      result(i,0)
-      result(i,0)
-    }
-    result(i,0) = total / ncol;
-    
+
+// [[Rcpp::export]]
+SEXP summaryC(const NumericMatrix& x,
+              const int nrow, const int ncol,
+              const NumericVector& quantiles)
+{
+  NumericMatrix result;
+  int no_quantiles = quantiles.size();
+  IntegerVector quant_ind_round_up(no_quantiles);
+  IntegerVector quant_ind_round_down(no_quantiles);
+  for (int k=0; k<no_quantiles; k++){
+    quant_ind_round_up[k] = ceil(quantiles[k]*ncol);
+    quant_ind_round_down[k] = floor(quantiles[k]*ncol);
   }
   
+  for(int i = 0; i < nrow; i++){
+    double total = 0;
+    double totalsquare = 0;
+    for (int j = 0; j < ncol; j++){
+      total += x(i,j);
+      totalsquare += pow(x(i,j),2);
+    }
+    result(i,0) = total / ncol; //mean
+    result(i,1) = totalsquare / ncol - pow(result(i,0),2); //var
+    result(i,2) = sqrt(result(i,1)); //sd
+    for(int q=0; q<no_quantiles; q++){ //quantiles
+      NumericVector v = (x.row(i));
+      v.sort();
+      result(i,q+3) = (quant_ind_round_down[q] + quant_ind_round_up[q]) / 2;
+    }
+
+  }
+
   return Rcpp::wrap(result);
 }
 
+
+NumericVector y = x(_,j); // Copy column -- original will not be mod
+std::nth_element(y.begin(), y.begin() + position, y.end())
+
+
+// 
+// if (quantiles[k] < 0.5){
+//   quantile_indices[k] = floor(quantiles[k]*ncol);
+// }
+// if (quantiles[k] < 0.5){
+//   quantile_indices[k] = ceil(quantiles[k]*ncol);
+// } 
+// }
 
 
 

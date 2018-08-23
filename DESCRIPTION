@@ -18,6 +18,8 @@ Description: The method for small area estimation added by this package is large
 License: GPL-3
 LazyData: true
 RdMacros: Rdpack
+Imports: Rcpp (>= 0.12.18), RcppEigen (>= 0.3.3.4.0), doParallel, foreach, data.table, bigstatsr, BH, Rdpack, dqrng
+LinkingTo: Rcpp, RcppEigen, bigstatsr, BH , dqrng
 SystemRequirements: C++11
 RoxygenNote: 6.1.0
 Suggests: testthat

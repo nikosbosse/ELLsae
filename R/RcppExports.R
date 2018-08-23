@@ -25,3 +25,7 @@ rowmeansBigC <- function(fbm) {
     .Call(`_ELLsae_rowmeansBigC`, fbm)
 }
 
+summaryC <- function(x, quantiles) {
+    .Call(`_ELLsae_summaryC`, x, quantiles)
+}
+

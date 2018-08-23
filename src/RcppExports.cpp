@@ -92,6 +92,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// summaryC
+SEXP summaryC(const NumericMatrix& x, const NumericVector& quantiles);
+RcppExport SEXP _ELLsae_summaryC(SEXP xSEXP, SEXP quantilesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const NumericMatrix& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const NumericVector& >::type quantiles(quantilesSEXP);
+    rcpp_result_gen = Rcpp::wrap(summaryC(x, quantiles));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_ELLsae_rowmeanC", (DL_FUNC) &_ELLsae_rowmeanC, 1},
@@ -100,6 +112,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_ELLsae_funD", (DL_FUNC) &_ELLsae_funD, 7},
     {"_ELLsae_funD2", (DL_FUNC) &_ELLsae_funD2, 7},
     {"_ELLsae_rowmeansBigC", (DL_FUNC) &_ELLsae_rowmeansBigC, 1},
+    {"_ELLsae_summaryC", (DL_FUNC) &_ELLsae_summaryC, 2},
     {NULL, NULL, 0}
 };
 

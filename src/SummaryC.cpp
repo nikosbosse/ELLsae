@@ -47,12 +47,12 @@ SEXP summaryC(const NumericMatrix& x,
     }
     result(i, 4 + no_quantiles) = v[ncol];
     
-    
   }
-  NumericVector a = (x.row(1));
-  a = a.sort();
-  // return Rcpp::wrap(result);
-  return Rcpp::wrap(a);
+  // NumericVector a = (x.row(1));
+  // a = a.sort();
+  // return Rcpp::wrap(a);
+  return Rcpp::wrap(result);
+
 }
 
 // 

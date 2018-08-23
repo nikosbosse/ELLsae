@@ -6,18 +6,6 @@
 
 using namespace Rcpp;
 
-// matrixmultiplicationC
-SEXP matrixmultiplicationC(const Eigen::Map<Eigen::MatrixXd> A, const Eigen::Map<Eigen::MatrixXd> B);
-RcppExport SEXP _ELLsae_matrixmultiplicationC(SEXP ASEXP, SEXP BSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type B(BSEXP);
-    rcpp_result_gen = Rcpp::wrap(matrixmultiplicationC(A, B));
-    return rcpp_result_gen;
-END_RCPP
-}
 // rowmeanC
 SEXP rowmeanC(NumericMatrix x);
 RcppExport SEXP _ELLsae_rowmeanC(SEXP xSEXP) {
@@ -58,7 +46,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_ELLsae_matrixmultiplicationC", (DL_FUNC) &_ELLsae_matrixmultiplicationC, 2},
     {"_ELLsae_rowmeanC", (DL_FUNC) &_ELLsae_rowmeanC, 1},
     {"_ELLsae_inferenceCensusC", (DL_FUNC) &_ELLsae_inferenceCensusC, 6},
     {"_ELLsae_rowmeansBigC", (DL_FUNC) &_ELLsae_rowmeansBigC, 1},

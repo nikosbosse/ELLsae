@@ -84,45 +84,45 @@ SEXP inferenceCensusC(const int n_bootstrap,
 }
 
 
+// 
+// // [[Rcpp::export]]
+// SEXP summaryC(const NumericMatrix& x,
+//               const int nrow, const int ncol,
+//               const NumericVector& quantiles)
+// {
+//   NumericMatrix result;
+//   int no_quantiles = quantiles.size();
+//   IntegerVector quant_ind_round_up(no_quantiles);
+//   IntegerVector quant_ind_round_down(no_quantiles);
+//   for (int k=0; k<no_quantiles; k++){
+//     quant_ind_round_up[k] = ceil(quantiles[k]*ncol);
+//     quant_ind_round_down[k] = floor(quantiles[k]*ncol);
+//   }
+//   
+//   for(int i = 0; i < nrow; i++){
+//     double total = 0;
+//     double totalsquare = 0;
+//     for (int j = 0; j < ncol; j++){
+//       total += x(i,j);
+//       totalsquare += pow(x(i,j),2);
+//     }
+//     result(i,0) = total / ncol; //mean
+//     result(i,1) = totalsquare / ncol - pow(result(i,0),2); //var
+//     result(i,2) = sqrt(result(i,1)); //sd
+//     for(int q=0; q<no_quantiles; q++){ //quantiles
+//       NumericVector v = (x.row(i));
+//       v.sort();
+//       result(i,q+3) = (quant_ind_round_down[q] + quant_ind_round_up[q]) / 2;
+//     }
+// 
+//   }
+// 
+//   return Rcpp::wrap(result);
+// }
 
-// [[Rcpp::export]]
-SEXP summaryC(const NumericMatrix& x,
-              const int nrow, const int ncol,
-              const NumericVector& quantiles)
-{
-  NumericMatrix result;
-  int no_quantiles = quantiles.size();
-  IntegerVector quant_ind_round_up(no_quantiles);
-  IntegerVector quant_ind_round_down(no_quantiles);
-  for (int k=0; k<no_quantiles; k++){
-    quant_ind_round_up[k] = ceil(quantiles[k]*ncol);
-    quant_ind_round_down[k] = floor(quantiles[k]*ncol);
-  }
-  
-  for(int i = 0; i < nrow; i++){
-    double total = 0;
-    double totalsquare = 0;
-    for (int j = 0; j < ncol; j++){
-      total += x(i,j);
-      totalsquare += pow(x(i,j),2);
-    }
-    result(i,0) = total / ncol; //mean
-    result(i,1) = totalsquare / ncol - pow(result(i,0),2); //var
-    result(i,2) = sqrt(result(i,1)); //sd
-    for(int q=0; q<no_quantiles; q++){ //quantiles
-      NumericVector v = (x.row(i));
-      v.sort();
-      result(i,q+3) = (quant_ind_round_down[q] + quant_ind_round_up[q]) / 2;
-    }
 
-  }
-
-  return Rcpp::wrap(result);
-}
-
-
-NumericVector y = x(_,j); // Copy column -- original will not be mod
-std::nth_element(y.begin(), y.begin() + position, y.end())
+// NumericVector y = x(_,j); // Copy column -- original will not be mod
+// std::nth_element(y.begin(), y.begin() + position, y.end())
 
 
 // 

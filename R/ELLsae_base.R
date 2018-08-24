@@ -1,7 +1,7 @@
-#' @title ELLsae
+#' @title ELLsae_base
 #' @description Beschreibung der Funktion
 #'
-#' \code{ELLsae} is a method for small area estimation used to impute a missing 
+#' \code{ELLsae_base} is a method for small area estimation used to impute a missing 
 #' variable from a smaller survey dataset into a census. The imputation is based 
 #' on a linear model and bootstrap samples. 
 #' 
@@ -27,6 +27,10 @@
 #'   be specified 
 #' @param parallel indicates if compution is supposed to be done in parallel to 
 #'   improve speed 
+#' @param output indicator for which output is requested as a list.
+#' @param save_yboot logical indicator if the bootraps of the response y are 
+#' supposed to be saved as a CSV file under your current working direktory. 
+#' The name is: ...
 #' @export yes
 #' @return The function returns a vector of the imputed variable as well as ... 
 #' @references A 
@@ -35,9 +39,9 @@
 #' @examples no examples are currently specified 
 
 
-ELLsae <- function(model, transformy = F, surveydata, censusdata, location_survey,
+ELLsae_base <- function(model, transformy = F, surveydata, censusdata, location_survey,
                     mResponse, location_census, n_boot = 50, welfare.function, test,
-                    parallel = F, trans = log, reverstrans = exp){
+                    parallel = F, trans = log, reverstrans = exp, output, save_yboot = F){
   
   
   # --------------------------------------------------------------------------------- #
@@ -238,10 +242,10 @@ ELLsae <- function(model, transformy = F, surveydata, censusdata, location_surve
   
   
   if(!missing(welfare.function)){
-    result <- rowmeanC(welfare.function(y_bootstrap))
+    result_wf <- rowmeanC(welfare.function(y_bootstrap))
     return(result)
   } else {
-    result <- rowmeanC(y_bootstrap)
+    result_y <- rowmeanC(y_bootstrap)
   }
   
   # result <- list()    
@@ -292,7 +296,43 @@ ELLsae <- function(model, transformy = F, surveydata, censusdata, location_surve
     }
   }
   
+  # This is an indicator if the large yBoot matrix is supposed to be saved or not
+  if(save_yboot = T){
+    fwrite(y_bootstrap, "Bootraps-of-Y.csv", sep = ",")
+  }
   
-  return(result)
+  # why this complicated?, we have to give different standard outputs if there 
+  # is a felfare function or not and for the custom output in the end a list 
+  # is returned
+  if(!missing(welfare.function) && missing(output)){
+    return(list(welfare_indicator = result_wf,
+                yhat = result_y, 
+                model_fit = model_fit, 
+                bootstrapCI = bootstrapCI))
+  } else if(missing(output) && missing(welfare.function)){
+    return(list(yhat = result, 
+                model_fit = model_fit, 
+                bootstrapCI = bootstrapCI))
+  }else if(!missing(output)){
+    output_list <- list()
+    for (i in 1:length(output)) {
+      if(output[i] == "yhat"){
+        output_list$yhat <- result
+      }else if(output[i] == "model_fit"){
+        output_list$model_fit <- model_fit
+      } else if(output[i] == "bootstrapCI"){
+        output_list$bootstapCI <- bootstapCI
+      } else if(output[i] == "surveydata"){
+        output_list$surveydata <- surveydata
+      } else if(output[i] == "censusdata"){
+        output_list$censusdata <- censusdata
+      } else if(output[i] == "welfare_indicator"){
+        output_list$welfare_indicator = result_wf
+      }
+      # Do we want direct estimates as well?
+    }
+    return(output_list)
+  }
+  
 }
 

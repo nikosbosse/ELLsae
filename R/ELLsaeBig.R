@@ -22,7 +22,7 @@
 
 ELLsaeBig <- function(model, surveydata, censusdata, location_survey,
                    mResponse, location_census, n_boot = 50, welfare.function, test,
-                   parallel = F){
+                   parallel = F, output, save_yboot = F){
   
   
   # --------------------------------------------------------------------------------- #
@@ -238,7 +238,7 @@ ELLsaeBig <- function(model, surveydata, censusdata, location_survey,
     ind <- c(0, cumsum(vector_of_num_boots))
     if(!missing(welfare.function)){
       tmp <- foreach(i=1:number_of_chunks, .combine = "c") %do% {
-        y_bootstrap[,(ind[i] + 1):ind[i +1] ] <- welfare.fun(ELLsae:::inferenceCensusC(n_bootstrap = vector_of_num_boots[i], 
+        y_bootstrap[,(ind[i] + 1):ind[i +1] ] <- welfare.function(ELLsae:::inferenceCensusC(n_bootstrap = vector_of_num_boots[i], 
                                                                            n_obs_censusdata = n_obs_census, locationeffects = location_effect, 
                                                                            residuals = residuals(model_fit), X = X_census, beta_sample = betas))
         NULL
@@ -256,7 +256,7 @@ ELLsaeBig <- function(model, surveydata, censusdata, location_survey,
 
   
 
-  result <- ELLsae::rowmeansBigC(y_bootstrap)
+  result_y <- ELLsae::rowmeansBigC(y_bootstrap)
 
   
   if(!missing(test)) {
@@ -280,5 +280,41 @@ ELLsaeBig <- function(model, surveydata, censusdata, location_survey,
   }
   
   
-  return(result)
+  # This is an indicator if the large yBoot matrix is supposed to be saved or not
+  if(save_yboot = T){
+    fwrite(y_bootstrap, "Bootraps-of-Y.csv", sep = ",")
+  }
+  
+  # why this complicated?, we have to give different standard outputs if there 
+  # is a felfare function or not and for the custom output in the end a list 
+  # is returned
+  if(!missing(welfare.function) && missing(output)){
+    return(list(welfare_indicator = result_y,
+                #yhat = result_y,  # gibt es hier nicht
+                model_fit = model_fit, 
+                bootstrapCI = bootstrapCI))
+  } else if(missing(output) && missing(welfare.function)){
+    return(list(yhat = result, 
+                model_fit = model_fit, 
+                bootstrapCI = bootstrapCI))
+  }else if(!missing(output)){
+    output_list <- list()
+    for (i in 1:length(output)) {
+      if(output[i] == "yhat"){
+        output_list$yhat <- result
+      }else if(output[i] == "model_fit"){
+        output_list$model_fit <- model_fit
+      } else if(output[i] == "bootstrapCI"){
+        output_list$bootstapCI <- bootstapCI
+      } else if(output[i] == "surveydata"){
+        output_list$surveydata <- surveydata
+      } else if(output[i] == "censusdata"){
+        output_list$censusdata <- censusdata
+      } else if(output[i] == "welfare_indicator"){
+        output_list$welfare_indicator = result_wf
+      }
+      # Do we want direct estimates as well?
+    }
+    return(output_list)
+  }
 }

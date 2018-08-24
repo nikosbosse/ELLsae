@@ -281,7 +281,7 @@ ELLsaeBig <- function(model, surveydata, censusdata, location_survey,
   
   
   # This is an indicator if the large yBoot matrix is supposed to be saved or not
-  if(save_yboot = T){
+  if(save_yboot == T){
     fwrite(y_bootstrap, "Bootraps-of-Y.csv", sep = ",")
   }
   

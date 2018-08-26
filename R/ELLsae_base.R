@@ -29,7 +29,6 @@
 #' @param save_yboot logical indicator if the bootraps of the response y are 
 #' supposed to be saved as a CSV file under your current working direktory. 
 #' The name is: ...
-#' @export yes
 #' @return The function takes the the typically smaller surveydata and uses the 
 #' argument \code{model} to estimate a linear model of the type \code{lm()}. In case
 #' the argument \code{mResponse} is specified means from the cluster data for the given 
@@ -57,9 +56,9 @@
 #' @references 
 #'   Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003). \emph{Micro-Level Estimation of Poverty and Inequality}. 
 #'   In: Econometrica 71.1, pp. 355-364, Jan 2003
-#'  
-#'  \insertRef{SAEcomparison}{ELLsae}
-#' @examples no examples are currently specified 
+#' 
+#' @examples mean(c(1,2,3,4))
+#' @export  
 
 
 ELLsae_base <- function(model, transformy = F, surveydata, censusdata, location_survey,

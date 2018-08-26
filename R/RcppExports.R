@@ -2,26 +2,26 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 rowmeanC <- function(x) {
-    .Call(`_ELLsae_rowmeanC`, x)
+    .Call('_ELLsae_rowmeanC', PACKAGE = 'ELLsae', x)
 }
 
 inferenceCensusC <- function(n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample) {
-    .Call(`_ELLsae_inferenceCensusC`, n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample)
+    .Call('_ELLsae_inferenceCensusC', PACKAGE = 'ELLsae', n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample)
 }
 
 funD <- function(n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, ncores) {
-    .Call(`_ELLsae_funD`, n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, ncores)
+    .Call('_ELLsae_funD', PACKAGE = 'ELLsae', n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, ncores)
 }
 
 funD2 <- function(n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, ncores) {
-    .Call(`_ELLsae_funD2`, n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, ncores)
+    .Call('_ELLsae_funD2', PACKAGE = 'ELLsae', n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, ncores)
 }
 
 rowmeansBigC <- function(fbm) {
-    .Call(`_ELLsae_rowmeansBigC`, fbm)
+    .Call('_ELLsae_rowmeansBigC', PACKAGE = 'ELLsae', fbm)
 }
 
 summaryC <- function(x, quantiles) {
-    .Call(`_ELLsae_summaryC`, x, quantiles)
+    .Call('_ELLsae_summaryC', PACKAGE = 'ELLsae', x, quantiles)
 }
 

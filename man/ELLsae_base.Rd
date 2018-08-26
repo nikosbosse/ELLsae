@@ -76,13 +76,11 @@ variable from a smaller survey dataset into a census. The imputation is based
 on a linear model and bootstrap samples.
 }
 \examples{
-no examples are currently specified 
+mean(c(1,2,3,4))
 }
 \references{
 Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003). \emph{Micro-Level Estimation of Poverty and Inequality}. 
   In: Econometrica 71.1, pp. 355-364, Jan 2003
- 
- \insertRef{SAEcomparison}{ELLsae}
 }
 \seealso{
 Other small area estimation methods can also be found 

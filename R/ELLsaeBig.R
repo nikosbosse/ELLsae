@@ -12,12 +12,20 @@
 #' calculated from the census data to account for the lack of information in a small survey
 #' @param n_boot Number of bootstrap samples used for the estimation, default is 50
 #' @param welfare.function Additionally a welfare function for the response can be specified
-#' @export yes
+#' @param parallel indicates if compution is supposed to be done in parallel to 
+#'   improve speed 
+#' @param output indicator for which output is requested as a list.
+#' @param save_yboot logical indicator if the bootraps of the response y are 
+#' supposed to be saved as a CSV file under your current working direktory. 
+#' The name is: ...
 #' @return Was die Funktion ausspuckt.
-#' @references
-#' @seealso
-#' @keywords
-#' @examples
+#' @references Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003). \emph{Micro-Level Estimation of Poverty and Inequality}. 
+#'   In: Econometrica 71.1, pp. 355-364, Jan 2003
+#' @seealso Other small area estimation methods can also be found in the package \code{sae}.
+#' @keywords ellsea, SAE
+#' @examples 1-2
+#' @export
+
 
 
 ELLsaeBig <- function(model, surveydata, censusdata, location_survey,

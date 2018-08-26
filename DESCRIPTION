@@ -5,10 +5,10 @@ Version: 1.0
 Date: 2018-08-16
 Authors@R: c(person("Nikos", "Bosse", role = c("aut", "cre"),
                      email = "nikos.bosse@stud.uni-goettingen.de"),
-              person("Felix.", "Suettmann", role = "aut",
+              person("Felix.", "Suettmann", role = c("aut", "cre"),
                      email = "felix.suettmann@stud.uni-goettingen.de"))
 Author: Nikos Bosse [aut, cre], 
-  Felix Suettmann [aut]
+  Felix Suettmann [aut, cre]
 Maintainer: Nikos Bosse <nikos.bosse@stud.uni-goettingen.de>
 Description: The method for small area estimation added by this package is largely based on an approach developed 
   by C. Elbers, J. Lanjouw and P. Lanjouw (2003). It can be used to impute a missing variable 
@@ -17,8 +17,6 @@ Description: The method for small area estimation added by this package is large
   is left omitted. 
 License: GPL-3
 LazyData: true
-Imports: Rcpp (>= 0.12.18), RcppEigen (>= 0.3.3.4.0), doParallel, foreach, data.table, bigstatsr, BH, dqrng
-LinkingTo: Rcpp, RcppEigen, bigstatsr, BH, dqrng
 RdMacros: Rdpack
 Imports: Rcpp (>= 0.12.18), RcppEigen (>= 0.3.3.4.0), doParallel, foreach, data.table, bigstatsr, BH, Rdpack, dqrng
 LinkingTo: Rcpp, RcppEigen, bigstatsr, BH , dqrng

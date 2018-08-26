@@ -5,7 +5,8 @@
 \title{ELLsaeBig}
 \usage{
 ELLsaeBig(model, surveydata, censusdata, location_survey, mResponse,
-  location_census, n_boot = 50, welfare.function, test, parallel = F)
+  location_census, n_boot = 50, welfare.function, test, parallel = F,
+  output, save_yboot = F)
 }
 \arguments{
 \item{model}{a model that is specified for the relationship betwenn

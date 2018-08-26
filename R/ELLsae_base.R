@@ -1,7 +1,5 @@
 #' @title ELLsae_base
-#' @description Beschreibung der Funktion
-#'
-#' \code{ELLsae_base} is a method for small area estimation used to impute a missing 
+#' @description \code{ELLsae_base} is a method for small area estimation used to impute a missing 
 #' variable from a smaller survey dataset into a census. The imputation is based 
 #' on a linear model and bootstrap samples. 
 #' 
@@ -32,16 +30,41 @@
 #' supposed to be saved as a CSV file under your current working direktory. 
 #' The name is: ...
 #' @export yes
-#' @return The function returns a vector of the imputed variable as well as ... 
-#' @references A 
-#' @seealso Other SAE methods can also be found in the package \code{sae}. 
-#' @keywords SAE imputation 
+#' @return The function takes the the typically smaller surveydata and uses the 
+#' argument \code{model} to estimate a linear model of the type \code{lm()}. In case
+#' the argument \code{mResponse} is specified means from the cluster data for the given 
+#' variables are calculated and merged with the survey databy cluster locations. These
+#' new explanatory variables are also used for the estimation of the linear model. 
+#' 
+#' In the second step 
+#' 
+#' The function returns a list with different objects. If \code{output} 
+#' is left unspecified the estimated Y´s or welfare estimates \code(yhat), 
+#' the fit of the linear model \code{model_fit} and a summary of the bootstrap samples
+#' \code{bootstrapCI} are returned.
+#' 
+#' If \code{output} is specified all the arguments given are returned. Next to the 
+#' above the following inputs are possible, \code{surveydata} and \code{censusdata}
+#' return the data frames used for the compution as some rows might be deleted due 
+#' to NA handling and additional variables are created for \code{mResponse}. 
+#' 
+#' Additionally the bootstrapped Y´s can be saved as a CSV if \code{save_yboot} is 
+#' set equal \code{TRUE} and can be found under the current working directory as 
+#' "Bootraps-of-Y.csv". 
+#' @seealso Other small area estimation methods can also be found 
+#' in the package \code{sae}. 
+#' @keywords SAE, imputation 
+#' @references 
+#'   Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003). \emph{Micro-Level Estimation of Poverty and Inequality}. 
+#'   In: Econometrica 71.1, pp. 355-364, Jan 2003
+#'  
+#'  \insertRef{SAEcomparison}{ELLsae}
 #' @examples no examples are currently specified 
 
 
 ELLsae_base <- function(model, transformy = F, surveydata, censusdata, location_survey,
                     mResponse, location_census, n_boot = 50, welfare.function, test,
-                    parallel = F, trans = log, reverstrans = exp, output, save_yboot = F){
+                    parallel = F, trans = log, reverstrans = exp, output, save_yboot = FALSE){
   
   
   # --------------------------------------------------------------------------------- #
@@ -305,12 +328,11 @@ ELLsae_base <- function(model, transformy = F, surveydata, censusdata, location_
   # is a felfare function or not and for the custom output in the end a list 
   # is returned
   if(!missing(welfare.function) && missing(output)){
-    return(list(welfare_indicator = result_wf,
-                yhat = result_y, 
+    return(list(yhat = result_wf, 
                 model_fit = model_fit, 
                 bootstrapCI = bootstrapCI))
   } else if(missing(output) && missing(welfare.function)){
-    return(list(yhat = result, 
+    return(list(yhat = result_y, 
                 model_fit = model_fit, 
                 bootstrapCI = bootstrapCI))
   }else if(!missing(output)){

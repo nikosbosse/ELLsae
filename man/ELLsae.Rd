@@ -28,6 +28,5 @@ Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003). \emph{Micro-Level Estimation 
 Other small area estimation methods can also be found in the package \code{sae}.
 }
 \author{
-Nikos Bosse [aut, cre], 
-Felix Suettmann [aut, cre]
+Nikos Bosse [aut, cre], Felix Suettmann [aut, cre]
 }

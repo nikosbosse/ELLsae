@@ -1,4 +1,4 @@
-#' @title randomSAEdata
+#' @title generateSAEdata
 #' @describeIn Provides example data for ELLsea functions and returns 
 #' a survey and census dataset
 #' @param nObs number of observations per area
@@ -14,7 +14,7 @@
 #'  area estimation methods for poverty mapping}. In: 17 (Mar. 2016), 41-66 and 156 and 158.
 #' 
 
-randomSAEdata <- function(nObs =30, nAreas = 50, betas = c(25, -0.029, 45.5), fraction = 0.2){
+generateSAEdata <- function(nObs =30, nAreas = 50, betas = c(25, -0.029, 45.5), fraction = 0.2){
   ntotal <- nObs*nAreas
   x1 <- rep(NA, ntotal)
   po <- 0

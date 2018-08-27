@@ -23,6 +23,10 @@ error correction and the location means (if \code{mResponse} is specified)}
 \item{mResponse}{Additional parameters for the regression based on location means
 calculated from the census data to account for the lack of information in a small survey}
 
+\item{location_census}{name of location variable (string) in the census data 
+which is used for error correction and location means. If \code{mResponse} 
+is specified, but \code{location_census} is missing}
+
 \item{n_boot}{Number of bootstrap samples used for the estimation, default is 50}
 
 \item{welfare.function}{Additionally a welfare function for the response can be specified}

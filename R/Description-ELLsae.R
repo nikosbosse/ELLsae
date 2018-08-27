@@ -8,8 +8,7 @@
 #' from a smaller survey dataset into a census. The imputation is based on a 
 #' linear model and bootstrap samples from a normal distribution. As of now the correction for heteroscedasticity 
 #' is left omitted. +
-#' @author Nikos Bosse [aut, cre], 
-#' Felix Suettmann [aut, cre]
+#' @author Nikos Bosse [aut, cre], Felix Suettmann [aut, cre]
 #' @docType package
 #' @name ELLsae
 #' @references Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003). \emph{Micro-Level Estimation of Poverty and Inequality}. 
@@ -18,5 +17,7 @@
 #' @import RcppEigen
 #' @import foreach
 #' @import data.table
+#' @importFrom MASS mvrnorm
 #' @importFrom Rdpack reprompt
+#' @importFrom stats as.formula coefficients delete.response lm model.matrix na.omit predict rbinom residuals rnorm rpois terms.formula vcov
 NULL

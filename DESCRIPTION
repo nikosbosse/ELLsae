@@ -26,7 +26,8 @@ Imports: Rcpp (>= 0.12.18),
       bigstatsr, 
       BH, 
       Rdpack, 
-      dqrng
+      dqrng,
+      MASS
 LinkingTo: Rcpp, 
       RcppEigen, 
       bigstatsr, 

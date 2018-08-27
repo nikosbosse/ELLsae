@@ -38,7 +38,7 @@
 #' In the second step 
 #' 
 #' The function returns a list with different objects. If \code{output} 
-#' is left unspecified the estimated Y´s or welfare estimates \code(yhat), 
+#' is left unspecified the estimated Y´s or welfare estimates \code{yhat}, 
 #' the fit of the linear model \code{model_fit} and a summary of the bootstrap samples
 #' \code{bootstrapCI} are returned.
 #' 

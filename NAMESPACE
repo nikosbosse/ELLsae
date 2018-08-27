@@ -2,6 +2,7 @@
 
 export(ELLsaeBig)
 export(ELLsae_base)
+export(randomSAEdata)
 import(RcppEigen)
 import(data.table)
 import(foreach)

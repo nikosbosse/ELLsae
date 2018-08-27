@@ -63,9 +63,11 @@
 #' @export  
 
 
-ELLsae_base <- function(model, transformy = F, surveydata, censusdata, location_survey,
-                    mResponse, location_census, n_boot = 50, welfare.function, test,
-                    parallel = F, trans = log, reverstrans = exp, output, save_yboot = FALSE){
+ELLsae_base <- function(model, surveydata, censusdata, 
+                        location_survey,location_census, 
+                        mResponse, n_boot = 50, seed, welfare.function, 
+                        transf, transf_inv, output = "default", num_cores = 1, 
+                        quantiles = c(0, 0.25, 0.5, 0.75, 1)){
   
   
   # --------------------------------------------------------------------------------- #
@@ -127,16 +129,17 @@ ELLsae_base <- function(model, transformy = F, surveydata, censusdata, location_
   # this section checks for missing values in the locations and omitts the respective rows
   # we still need is.na because if there are NAs in the census and survey locations the above does not
   # fail!
-  if(any(is.na(surveydata[, location_survey]))){ 
-    warning("The locations are not allowed to have missing values. Rows with missing values are omitted") 
-    surveydata <- surveydata[!is.na(surveydata[, location_survey])]
-  }  
   if (!(length(location_survey) == 1 & is.character(location_survey))) {
     stop("you have to provide a string with the variable indicating the location in the survey data set")
   }
   if (!any(location_survey == names(surveydata))){
     stop("String that was specified as variable name for the location is not the name of one of the variables in the survey data set.")
   }
+  if(any(is.na(surveydata[, ..location_survey]))){ 
+    warning("There are missing values in the locations of your surveydata set. Rows with missing values were omitted") 
+    surveydata <- surveydata[!is.na(surveydata[, location_survey])]
+  } 
+  
   #### check if input for mResponse is valid and reformat
   if(!missing(mResponse)){
     # if mResponse is used we need a string with the census location
@@ -199,10 +202,10 @@ ELLsae_base <- function(model, transformy = F, surveydata, censusdata, location_
                                    sep = " + ")
     model <- as.formula(paste(model_left_hand_side, model_right_hand_side, sep = " ~ "))
   }
-  # if(transformy == T){
-  #   y <- all.vars(model)[1]
-  #   suveydata[, c(y) := trans(..y)]
-  # }
+  if(!missing(transf)){
+    y <- all.vars(model)[1]
+    suveydata[, c(y) := transf(..y)]
+  }
   
   # --------------------------------------------------------------------------------- #
   # ----------------------------- inference survey ---------------------------------- #
@@ -248,114 +251,58 @@ ELLsae_base <- function(model, transformy = F, surveydata, censusdata, location_
   t <- terms.formula(model)
   t <- delete.response(t)
   X_census <- model.matrix(t, censusdata)
-  X_census <- na.omit(X_census)
+  if(any(is.na(X_census))){
+    warning("some explanatory variables in the census data set were missing. Affected rows were removed")
+    X_census <- na.omit(X_census)
+  }
+  
   
   betas <- t(MASS::mvrnorm(n = n_boot,
                            mu = coefficients(model_fit),
                            Sigma = vcov(summary(model_fit))))
 
-  num_cores <- parallel::detectCores() - 3
-  # y_bootstrap <- ELLsae:::funD(n_bootstrap = n_boot, n_obs_censusdata = n_obs_census,
-  #                                           locationeffects = location_effect, 
-  #                                           residuals = residuals(model_fit),
-  #                                           X = X_census, beta_sample = betas, ncores = num_cores)
-  y_bootstrap <- ELLsae:::inferenceCensusC(n_bootstrap = n_boot, n_obs_censusdata = n_obs_census,
-                               locationeffects = location_effect, 
-                               residuals = residuals(model_fit),
-                               X = X_census, beta_sample = betas)
+  # in Dokumentation schreiben: num_cores <- parallel::detectCores() - 1
+  
+  if(missing(seed)){
+    seed = as.numeric(Sys.time())
+  }
+  
+  bootstrap <- .InfCensCpp(n_bootstrap = n_boot, n_obs_censusdata = n_obs_census,
+                             locationeffects = location_effect, 
+                             residuals = residuals(model_fit),
+                             X = X_census, beta_sample = betas, userseed = seed, ncores = num_cores)
   
   
   if(!missing(welfare.function)){
-    result_wf <- rowmeanC(welfare.function(y_bootstrap))
-    return(result)
-  } else {
-    result_y <- rowmeanC(y_bootstrap)
+    bootstrap <- welfare.function(bootstrap)
+  } 
+  
+  # # This is an indicator if the large yBoot matrix is supposed to be saved or not
+  # if(save_yboot == T){
+  #   fwrite(y_bootstrap, "Bootraps-of-Y.csv", sep = ",")
+  # }
+  
+  
+  output_list <- list()
+  if(output == "default" | output == "all" | "summary" %in% output){
+    summaryboot <- .summaryParC(bootstrap, quantiles = quantiles, 
+                                nrow = n_obs_census, ncol = n_boot, 
+                                ncores = num_cores)
+    colnames(summaryboot) <- c("mean", "var", "sd", paste(quantiles*100, "%-Quant", sep = ""))
+    output_list$summary_boot <- summaryboot
+  } 
+  if(output == "default" | output == "all" | "model_fit" %in% output){
+    output_list$lm_res_survey <- model_fit
   }
+  if(output == "default" | output == "all" | "survey" %in% output){
+    output_list$surveydata <- surveydata
+  } 
+  if(output == "default" | output == "all" | "census" %in% output){
+    output_list$censusdata <- censusdata
+  } 
   
-  # result <- list()    
-  # if("y" %in% output){
-  #   output$y <- rowmeanC(y_bootstrap)
-  # }
-  # 
-  # if (output == "summary"){
-  #   result$summarystatistics
-  # }
-  # if(output == "sample"){
-  #   reverstrans(result)
-  # }
-  # 
-  # if(output = "survey"){
-  #   
-  # }
-  # if(output = "census"){
-  #   
-  # }
-  # if(!missing samplefile){
-  #   # sample in einem File abspeichern
-  # }
-  
-  
-  # Rcpp function for summary statistics
-  # mean, median, variance, vector of quantiles
-  
-  
-  
-  if(!missing(test)) {
-    if(test == "meanforregression"){
-      m <- list(censusmeans = means_from_census,
-                surveydata = surveydata,
-                newmodel = model)
-      return(m)
-    }
-    if(test == "welfare_bootstrap"){
-      welfare_bootstrap <- welfare.function(y_bootstrap)
-      return(welfare_bootstrap)
-    }
-    if(test == "yboot"){
-      y_simple_pred <- predict(model_fit, newdata = censusdata)
-      res <- list(ymvnorm = y_hat_mvnorm,
-                  locboot = random_location_boot,
-                  resboot = bootstrap_res,
-                  ysimplepred = y_simple_pred)
-    }
-  }
-  
-  # This is an indicator if the large yBoot matrix is supposed to be saved or not
-  if(save_yboot == T){
-    fwrite(y_bootstrap, "Bootraps-of-Y.csv", sep = ",")
-  }
-  
-  # why this complicated?, we have to give different standard outputs if there 
-  # is a felfare function or not and for the custom output in the end a list 
-  # is returned
-  if(!missing(welfare.function) && missing(output)){
-    return(list(yhat = result_wf, 
-                model_fit = model_fit, 
-                bootstrapCI = bootstrapCI))
-  } else if(missing(output) && missing(welfare.function)){
-    return(list(yhat = result_y, 
-                model_fit = model_fit, 
-                bootstrapCI = bootstrapCI))
-  }else if(!missing(output)){
-    output_list <- list()
-    for (i in 1:length(output)) {
-      if(output[i] == "yhat"){
-        output_list$yhat <- result
-      }else if(output[i] == "model_fit"){
-        output_list$model_fit <- model_fit
-      } else if(output[i] == "bootstrapCI"){
-        output_list$bootstapCI <- bootstapCI
-      } else if(output[i] == "surveydata"){
-        output_list$surveydata <- surveydata
-      } else if(output[i] == "censusdata"){
-        output_list$censusdata <- censusdata
-      } else if(output[i] == "welfare_indicator"){
-        output_list$welfare_indicator = result_wf
-      }
-      # Do we want direct estimates as well?
-    }
-    return(output_list)
-  }
-  
+  return(output_list)
 }
+  
+
 

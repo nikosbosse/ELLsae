@@ -1,6 +1,6 @@
 library(foreach)
 library(data.table)
-data <- ELLsae::brazil
+data <- SAE::househoulddatabrazil
 helper <- sample(x = 1:nrow(data), size = nrow(data)/5, replace = F)
 helper <- sort(helper)
 surv <- data[helper,]
@@ -17,8 +17,15 @@ library(profvis)
 
 #ohne Parallelisierung, ohne FBM
 prof <- profvis({
-  y <- ELLsae(model = mod, surveydata = surv, censusdata = cens, location_survey = loc, n_boot = 250)
-})
+  y <- ELLsae_base(model = mod, surveydata = surv, censusdata = cens, location_survey = loc, n_boot = 250)
+}); prof
+
+#ohne Parallelisierung, ohne FBM
+prof2 <- profvis({
+  y <- ELLsae_base(model = mod, surveydata = surv, censusdata = cens, location_survey = loc, n_boot = 250, num_cores = 8)
+}); prof2
+
+
 #mit Parallelisierung, ohne FBM
 prof2 <- profvis({
   y <- ELLsae::ELLsae(model = mod, surveydata = surv, censusdata = cens, location_survey = loc, n_boot = 250, parallel = T)

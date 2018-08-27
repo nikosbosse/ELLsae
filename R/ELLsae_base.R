@@ -57,6 +57,8 @@
 #'   Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003). \emph{Micro-Level Estimation of Poverty and Inequality}. 
 #'   In: Econometrica 71.1, pp. 355-364, Jan 2003
 #' 
+#'   Guadarrama Sanz, M., Molina, I., and Rao, J.N.K.  (2016). \emph{A comparison of small 
+#'   area estimation methods for poverty mapping}. In: 17 (Mar. 2016), 41-66 and 156 and 158.
 #' @examples mean(c(1,2,3,4))
 #' @export  
 

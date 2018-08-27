@@ -2,9 +2,9 @@ library(ELLsae)
 
 context("Testing of the meanforregression - part of ELLsae")
 
-##################
+###################
 ### Preliminary ###
-##################
+###################
 
 df.survey <- data.frame(y = c(1,2,3,4,1,2,3,4,1),
                         a = c(1,2,3,1,2,3,1,2,3),
@@ -14,7 +14,7 @@ df.census <- data.frame(a = (c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1)),
                         b = c(5,3,7,2,5,4,7,5,1,1,7,9,5,4,7,2))
 
 test_that("computing the means actually works", {
-  expect_equal(ELLsae(model = y ~ a + b, mResponse = "b",
+  expect_equal(ELLsae_base(model = y ~ a + b, mResponse = "b",
                        surveydata = df.survey, censusdata = df.census,
                        location_survey = "a",
                        test = "meanforregression")$censusmeans$b_meanCensus,

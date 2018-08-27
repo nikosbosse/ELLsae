@@ -19,8 +19,8 @@ test_that("the function works", {
 # -------------- welfare functions ------------------ #
 
 test_that("different welfare functions can be introduced", {
-  expect_equal(length(ELLsae(model, surveydata , censusdata, location_survey, n_boot = 5, welfare.function = function(x){2*x}, test = "")),8)
-  expect_equal(length(ELLsae(model, surveydata , censusdata, location_survey, n_boot = 5, welfare.function = function(x){log(x^2 + 2)}, test = "")),8)
+  expect_equal(length(ELLsae_base(model, surveydata , censusdata, location_survey, n_boot = 5, welfare.function = function(x){2*x}, test = "")),8)
+  expect_equal(length(ELLsae_base(model, surveydata , censusdata, location_survey, n_boot = 5, welfare.function = function(x){log(x^2 + 2)}, test = "")),8)
 })
 
 

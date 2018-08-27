@@ -1,4 +1,4 @@
-// // -*- mode: C++; c-indent-level: 4; c-basic-offset: 4; indent-tabs-mode: nil; -*-
+// // -- mode: C++; c-indent-level: 4; c-basic-offset: 4; indent-tabs-mode: nil; --
 
 
 // [[Rcpp::depends(RcppEigen)]]
@@ -35,9 +35,9 @@ SEXP summaryC(NumericMatrix x,
       indices[k+1] = ceil(quantiles[k] * (ncol-1));
     }
   }
-//   #pragma omp parallel num_threads(ncores)
+  //   #pragma omp parallel num_threads(ncores)
   {
-//     #pragma omp for
+    //     #pragma omp for
     for(int i = 0; i < nrow; i++){
       double total = 0;
       double totalsquare = 0;
@@ -62,11 +62,10 @@ SEXP summaryC(NumericMatrix x,
 
 
 
-
 // [[Rcpp::export]]
 SEXP summaryParC(NumericMatrix x,
-              NumericVector quantiles,
-              int nrow, int ncol, const int ncores)
+                 NumericVector quantiles,
+                 int nrow, int ncol, const int ncores)
 {
   const int no_quantiles = quantiles.size();
   NumericMatrix result(nrow, no_quantiles + 3);
@@ -79,30 +78,34 @@ SEXP summaryParC(NumericMatrix x,
       indices[k+1] = ceil(quantiles[k] * (ncol-1));
     }
   }
-  #pragma omp parallel num_threads(ncores)
-  {
-    #pragma omp for
-    for(int i = 0; i < nrow; i++){
-      double total = 0;
-      double totalsquare = 0;
-      for (int j = 0; j < ncol; j++){
-        total += x(i,j);
-        totalsquare += pow(x(i,j),2);
-      }
-      result(i,0) = total / ncol; //mean
-      result(i,1) = totalsquare / ncol - pow(result(i,0),2); //var
-      result(i,2) = sqrt(result(i,1)); //sd
-      
-      NumericVector v = (x.row(i));
-      for(int q=0; q<no_quantiles; q++){ //quantiles
-        std::nth_element(v.begin() + indices[q] + 1, v.begin() + indices[q+1], v.end());
-        result(i,q+3) = *(v.begin() + indices[q+1]);
-      }
+#pragma omp parallel num_threads(ncores)
+{
+#pragma omp for ordered schedule(dynamic)
+  for(int i = 0; i < nrow; i++){
+    double total = 0;
+    double totalsquare = 0;
+    for (int j = 0; j < ncol; j++){
+      total += x(i,j);
+      totalsquare += pow(x(i,j),2);
     }
+    double mean = total / ncol;
+    double var = totalsquare / ncol - pow(mean,2);
+    result(i,0) = mean; // mean
+    result(i,1) = var; // var
+    result(i,2) = sqrt(var); // sd
+    
+#pragma omp ordered
+{
+  NumericVector v = (x.row(i));
+  for(int q=0; q<no_quantiles; q++){ // quantiles
+    std::nth_element(v.begin() + indices[q] + 1, v.begin() + indices[q+1], v.end());
+    result(i,q+3) = *(v.begin() + indices[q+1]);
   }
+}
+  }
+}
   return Rcpp::wrap(result);
 }
-
 
 
 

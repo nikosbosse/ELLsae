@@ -105,7 +105,7 @@ ELLsae_base <- function(model, surveydata, censusdata,
   if(class(surveydata) != "data.table"){
     surveydata <- try(as.data.table(surveydata), silent = T)
     if (any(class(surveydata) == "try-error")){
-      stop("survey data should be provided as data.table or something similar.
+      stop("Survey data should be provided as data.table or something similar.
            ELLsae was not able to convert your input into a data.table")
     }
   }
@@ -119,7 +119,7 @@ ELLsae_base <- function(model, surveydata, censusdata,
   if(class(censusdata) != "data.table"){ # alternativ if(!is.data.table(censusdata))?
     censusdata <- try(as.data.table(censusdata))
     if (any(class(censusdata) == "try-error")){
-      stop("census data should be provided as data.table or something similar.
+      stop("Census data should be provided as data.table or something similar.
            ELLsae was not able to convert your input into a data.table")
     }
   }

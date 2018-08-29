@@ -25,7 +25,8 @@ data which is used for error correction and the location means (if
 \code{clustermeans} is specified)}
 
 \item{location_census}{name of location variable (string) in the census data 
-which is used for error correction and location means. If \code{clustermeans} 
+which is used for error correction and location means. 
+If \code{clustermeans} 
 is specified, but \code{location_census} is missing}
 
 \item{clustermeans}{Additional parameters for the regression based on location 

@@ -3,7 +3,6 @@
 export(ELLsae_base)
 export(ELLsae_big)
 export(generateSAEdata)
-import(RcppEigen)
 import(data.table)
 import(stats)
 importFrom(MASS,mvrnorm)

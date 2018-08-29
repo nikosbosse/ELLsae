@@ -9,16 +9,37 @@ rm(list = "helper") #delete helper
 
 mod <-  hh_inc ~ age + urban + rooms + sex + religion + race + adults + children
 loc <- "geo2_br"
-y_true <- cens[,names(cens) == "hh_inc"]
-truemean <- mean(y_true)
 
 
+
+library(ELLsae)
 library(profvis)
 
 #ohne Parallelisierung, ohne FBM
 prof <- profvis({
-  y <- ELLsae_base(model = mod, surveydata = surv, censusdata = cens, location_survey = loc, n_boot = 250)
+  y <- ELLsae_base(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 50, seed = 5)
+  y <- ELLsae_big(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 50, seed = 5)
 }); prof
+
+all(round(y$summary_boot[1:5,1:8], 6) == round(y2$summary_boot[1:5,1:8], 6))
+
+
+# some numeric randomness?
+all(round(y$bootsample[1,], 5) == round(y2$bootsample[], 5))
+
+
+y$summary_boot[1:5,1:8]
+y2$summary_boot[1:5,1:8]
+min(y$bootsample[5,])
+
+b <- y$bootsample[]
+tb <- t(b)
+
+.summaryBigCt(tb, quantiles = c(0,0.25,0.5,0.75,1), nrow = nrow(tb), ncol = ncol(tb))
+.summaryParC(b, quantiles = c(0,0.25,0.5,0.75,1), nrow = nrow(b), ncol = ncol(b), ncores = 6)
+
+
+
 
 #ohne Parallelisierung, ohne FBM
 prof2 <- profvis({
@@ -43,6 +64,15 @@ prof3 <- profvis({
 })
 
 # debugonce(ELLsae::ELLsaeBig)
+
+
+
+
+
+
+
+
+
 
 
 

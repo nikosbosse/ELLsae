@@ -1,3 +1,4 @@
+
 #' @title ELLsaeBig
 #' @description Beschreibung der Funktion
 #'
@@ -31,10 +32,10 @@
 #' @seealso Other small area estimation methods can also be found in the package \code{sae}.
 #' @keywords ellsea, SAE
 #' @examples 1-2
-#' @export
 
- 
- 
+
+# 
+# 
 # ELLsaeBig <- function(model, surveydata, censusdata, location_survey,
 #                    mResponse, location_census, n_boot = 50, welfare.function, test,
 #                    parallel = F, output, save_yboot = F){

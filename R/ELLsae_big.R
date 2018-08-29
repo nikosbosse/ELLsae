@@ -35,11 +35,7 @@
 #' variables are calculated and merged with the survey databy cluster locations. These
 #' new explanatory variables are also used for the estimation of the linear model. 
 #' 
-#' In the second step a C++ fuction takes over and calculates \code{nboot} predicted 
-#' Y´s by using the betas from the first step to draw from a multivariate normal distribution
-#' and draws indicidual and nested errors at random with replacement. If requested the Y´s 
-#' are used to estimate the welfare function after which either the mean of the yhat or of the 
-#' welfare fuctiom is returned.
+#' In the second step 
 #' 
 #' The function returns a list with different objects. If \code{output} 
 #' is left unspecified the estimated Y´s or welfare estimates \code{yhat}, 
@@ -67,7 +63,7 @@
 #' @export  
 
 
-ELLsae_base <- function(model, surveydata, censusdata, 
+ELLsae_big <- function(model, surveydata, censusdata, 
                         location_survey,location_census, 
                         mResponse, n_boot = 50, seed, welfare.function, 
                         transf, transf_inv, output = "default", num_cores = 1, 
@@ -98,17 +94,17 @@ ELLsae_base <- function(model, surveydata, censusdata,
       stop("model must either be provided as a formula or as a string.
            See ?formula for help")
     }
-  }
+    }
   
   ##### check whether surveydata is specified correctly and try to correct
   if(missing(surveydata)) stop("Data frame with the surveydata is missing")
   if(class(surveydata) != "data.table"){
     surveydata <- try(as.data.table(surveydata), silent = T)
     if (any(class(surveydata) == "try-error")){
-      stop("Survey data should be provided as data.table or something similar.
+      stop("survey data should be provided as data.table or something similar.
            ELLsae was not able to convert your input into a data.table")
     }
-  }
+    }
   n_obs_survey <- nrow(surveydata)
   if(!all( all.vars(model)[-1] %in%  names(surveydata))){
     stop("the model you provided specifies variables that are not included in the surveydata")
@@ -119,15 +115,15 @@ ELLsae_base <- function(model, surveydata, censusdata,
   if(class(censusdata) != "data.table"){ # alternativ if(!is.data.table(censusdata))?
     censusdata <- try(as.data.table(censusdata))
     if (any(class(censusdata) == "try-error")){
-      stop("Census data should be provided as data.table or something similar.
+      stop("census data should be provided as data.table or something similar.
            ELLsae was not able to convert your input into a data.table")
     }
-  }
+    }
   if(!all( all.vars(model)[-1] %in%  names(censusdata))){
     stop("the model you provided specifies variables that are not included in the censusdata")
   }
   n_obs_census <- nrow(censusdata)
- 
+  
   ##### check whether the locations are specified correctly and try to correct
   if(missing(location_survey)) stop("you have to provide either 1) a vector of locations of length corresponding to the number of observations in the survey data or 2) a string with the name of a variable in the surveydata that provides the locations of individual observations")
   # this section checks for missing values in the locations and omitts the respective rows
@@ -153,10 +149,10 @@ ELLsae_base <- function(model, surveydata, censusdata,
              different from 'log', you have to provide an inverse function for
              backtransformation of the bootstrap sample")
       }
-      }
+    }
     y <- all.vars(model)[1]
     suveydata[, c(y) := transf(..y)]
-      }
+  }
   
   
   #### check if input for mResponse is valid and reformat
@@ -169,7 +165,7 @@ ELLsae_base <- function(model, surveydata, censusdata,
         stop("if you want to use mResponse, you also have to provide a string indicating the name of the location variable in the census dataset.
              If the variable names are identical, one string for location_survey suffices.")
       }
-    }
+      }
     # checks if all the locations in the survey data are equal to those in the census. 
     if(!all(unique(surveydata[, location_survey]) %in% unique(censusdata[,location_census]))){
       stop("Locations from the survey data must be nested in the census data")
@@ -220,8 +216,11 @@ ELLsae_base <- function(model, surveydata, censusdata,
                                    paste(new_var_names, collapse = " + "),
                                    sep = " + ")
     model <- as.formula(paste(model_left_hand_side, model_right_hand_side, sep = " ~ "))
+    }
+  if(!missing(transf)){
+    y <- all.vars(model)[1]
+    suveydata[, c(y) := transf(..y)]
   }
-
   
   # --------------------------------------------------------------------------------- #
   # ----------------------------- inference survey ---------------------------------- #
@@ -272,7 +271,6 @@ ELLsae_base <- function(model, surveydata, censusdata,
     X_census <- na.omit(X_census)
   }
   
-  
   if(!missing(seed)){
     set.seed(seed)
   }
@@ -280,26 +278,38 @@ ELLsae_base <- function(model, surveydata, censusdata,
   betas <- t(MASS::mvrnorm(n = n_boot,
                            mu = coefficients(model_fit),
                            Sigma = vcov(summary(model_fit))))
-
+  
   # in Dokumentation schreiben: num_cores <- parallel::detectCores() - 1
   
   if(missing(seed)){
     seed = as.numeric(Sys.time())
   }
   
-  bootstrap <- .InfCensCpp(n_bootstrap = n_boot, n_obs_censusdata = n_obs_census,
-                             locationeffects = location_effect, 
-                             residuals = residuals(model_fit),
-                             X = X_census, beta_sample = betas, userseed = seed, ncores = num_cores)
+  bootstrap <- bigstatsr::FBM(nrow = n_obs_census, ncol = n_boot, type = "double")
   
-  if(!missing(transf)){
-    bootstrap <- transf_inv(bootstrap)
-  }
+  .InfCensBigCpp(fbm = bootstrap, 
+                n_bootstrap = n_boot, n_obs_censusdata = n_obs_census,
+                locationeffects = location_effect, 
+                residuals = residuals(model_fit),
+                X = X_census, beta_sample = betas, userseed = seed, ncores = num_cores)
+  
+  
+  
+  bigstatsr::big_apply(bootstrap,
+                       a.FUN = function(bootstrap, ind, fun){
+                         bootstrap[,ind] <- fun(bootstrap[,ind])
+                         NULL
+                       }, 
+                       a.combine = 'c', ncores = num_cores, 
+                       fun = welfare.function)
+  
   
   
   if(!missing(welfare.function)){
     bootstrap <- welfare.function(bootstrap)
   } 
+  
+  
   
   # # This is an indicator if the large yBoot matrix is supposed to be saved or not
   # if(save_yboot == T){
@@ -309,9 +319,21 @@ ELLsae_base <- function(model, surveydata, censusdata,
   
   output_list <- list()
   if(output == "default" | output == "all" | "summary" %in% output){
-    summaryboot <- .summaryParC(bootstrap, quantiles = quantiles, 
-                                nrow = n_obs_census, ncol = n_boot, 
-                                ncores = num_cores)
+    tboot <- bigstatsr::big_transpose(bootstrap) 
+    # big_apply works more efficiently columnwise
+    summaryboot <- bigstatsr::big_apply(tboot,
+                                        a.FUN = function(bootstrap, ind,
+                                                         fun, q, boot) {
+
+                                          fun(x = bootstrap[,ind],
+                                              quantiles = q, nrow = boot,
+                                              ncol = length(ind))
+
+                                        }, a.combine = 'rbind',
+                                        ncores = num_cores,
+                                        fun = .summaryBigCt, q = quantiles,
+                                        boot = n_boot)
+    
     colnames(summaryboot) <- c("mean", "var", "sd", paste(quantiles*100, "%-Quant", sep = ""))
     output_list$summary_boot <- summaryboot
   }
@@ -330,6 +352,33 @@ ELLsae_base <- function(model, surveydata, censusdata,
   
   return(output_list)
 }
-  
 
 
+
+
+
+
+# summaryboot <- big_apply(tboot, 
+#                          a.FUN = function(X, ind, q){
+#                            var = apply(X, MARGIN = 2, FUN = var)
+#                            sd = sqrt(var)
+#                            
+#                            return(t(rbind(mean = colMeans(X),
+#                                           var = var,
+#                                           sd = sd,
+#                                           quantile(x, probs = q))))
+#                          } 
+#                          a.combine = 'rbind', q = quantiles)
+
+
+# summaryboot <- .summaryBigCt(tboot[], quantiles = quantiles, nrow = n_boot, ncol = n_obs_census)
+
+# summaryboot <- bigstatsr::big_apply(bootstrap,
+#                      a.FUN = function(bootstrap, ind, fun, n_obs, loc, res, X_census, betas) {
+#                        
+#                        fun(x = bootstrap[ind,], quantiles = q, nrow = length(ind), ncol = boot)
+#                      
+#                        }, a.combine = 'c', ind = bigstatsr::rows_along(bootstrap), 
+#                      ncores = 1, fun = .summaryBigC, boot = n_boot)
+# 
+# #bigstatsr::nb_cores()

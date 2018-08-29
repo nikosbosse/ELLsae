@@ -2,7 +2,6 @@
 #' @section ELLsae functions:
 #' Delivered are two functions that do about the same thing ...
 #' @description A method for small area estimation.
-#' @describeIn \code{generateSAEdata} HELLO
 #' @details  The method for small area estimation added by this package is 
 #' largely based on an approach developed 
 #' by C. Elbers, J. Lanjouw and P. Lanjouw (2003). It can be used to impute a 
@@ -19,7 +18,6 @@
 #'   In: Econometrica 71.1, pp. 355-364, Jan 2003
 #' @seealso Other small area estimation methods can also be found in the 
 #' package \code{sae}.
-#' @import RcppEigen
 #' @import data.table
 #' @import stats
 #' @importFrom MASS mvrnorm

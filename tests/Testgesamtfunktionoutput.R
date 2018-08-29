@@ -17,9 +17,12 @@ library(profvis)
 
 #ohne Parallelisierung, ohne FBM
 prof <- profvis({
-  y <- ELLsae::ELLsae_base(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 50, seed = 5)
-  y <- ELLsae_big(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 50, seed = 5)
+  y <- ELLsae_base(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 250L, seed = 5, num_cores = 7)
+
 }); prof
+
+
+y <- ELLsae_big(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 50, seed = 5)
 
 all(round(y$summary_boot[1:5,1:8], 6) == round(y2$summary_boot[1:5,1:8], 6))
 

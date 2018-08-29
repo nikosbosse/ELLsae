@@ -7,7 +7,7 @@
 ELLsae_big(model, surveydata, censusdata, location_survey, location_census,
   mResponse, n_boot = 50, seed, welfare.function, transf, transf_inv,
   output = "default", num_cores = 1, quantiles = c(0, 0.25, 0.5,
-  0.75, 1))
+  0.75, 1), save_boot = F)
 }
 \arguments{
 \item{model}{a model that is specified for the relationship betwenn the 
@@ -17,8 +17,8 @@ be processed by \code{lm()}}
 \item{surveydata}{Smaller surveydata with additional response variable of 
 interest. Will be used to estimate the linear model}
 
-\item{censusdata}{The dataset in which a certain variable is supposed to be 
-imputed}
+\item{censusdata}{The dataset in which the response from \code{model} is 
+supposed to be imputed}
 
 \item{location_survey}{Name of location variable or vector for the survey 
 data which is used for error correction and the location means (if 
@@ -75,7 +75,8 @@ set equal \code{TRUE} and can be found under the current working directory as
 "Bootraps-of-Y.csv".
 }
 \description{
-\code{ELLsae_base} is a method for small area estimation used to impute a missing 
+\code{ELLsae_base} is a method for small area estimation used to
+ impute a missing 
 variable from a smaller survey dataset into a census. The imputation is based 
 on a linear model and bootstrap samples.
 }

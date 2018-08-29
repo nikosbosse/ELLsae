@@ -1,5 +1,6 @@
 #' @title ELLsae_base
-#' @description \code{ELLsae_base} is a method for small area estimation used to impute a missing 
+#' @description \code{ELLsae_base} is a method for small area estimation used to
+#'  impute a missing 
 #' variable from a smaller survey dataset into a census. The imputation is based 
 #' on a linear model and bootstrap samples. 
 #' 
@@ -8,8 +9,8 @@
 #'   be processed by \code{lm()} 
 #' @param surveydata Smaller surveydata with additional response variable of 
 #'   interest. Will be used to estimate the linear model 
-#' @param censusdata The dataset in which a certain variable is supposed to be 
-#'   imputed 
+#' @param censusdata The dataset in which the response from \code{model} is 
+#' supposed to be imputed 
 #' @param location_survey Name of location variable or vector for the survey 
 #'   data which is used for error correction and the location means (if 
 #'   \code{mResponse} is specified) 
@@ -35,7 +36,11 @@
 #' variables are calculated and merged with the survey databy cluster locations. These
 #' new explanatory variables are also used for the estimation of the linear model. 
 #' 
-#' In the second step 
+#' In the second step a C++ fuction takes over and calculates \code{nboot} predicted 
+#' Y´s by using the betas from the first step to draw from a multivariate normal distribution
+#' and draws indicidual and nested errors at random with replacement. If requested the Y´s 
+#' are used to estimate the welfare function after which either the mean of the yhat or of the 
+#' welfare fuctiom is returned.
 #' 
 #' The function returns a list with different objects. If \code{output} 
 #' is left unspecified the estimated Y´s or welfare estimates \code{yhat}, 

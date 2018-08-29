@@ -35,7 +35,11 @@
 #' variables are calculated and merged with the survey databy cluster locations. These
 #' new explanatory variables are also used for the estimation of the linear model. 
 #' 
-#' In the second step 
+#' In the second step a C++ fuction takes over and calculates \code{nboot} predicted 
+#' Y´s by using the betas from the first step to draw from a multivariate normal distribution
+#' and draws indicidual and nested errors at random with replacement. If requested the Y´s 
+#' are used to estimate the welfare function after which either the mean of the yhat or of the 
+#' welfare fuctiom is returned.
 #' 
 #' The function returns a list with different objects. If \code{output} 
 #' is left unspecified the estimated Y´s or welfare estimates \code{yhat}, 

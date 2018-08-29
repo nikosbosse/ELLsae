@@ -12,7 +12,7 @@ generateSAEdata(nObs = 30, nAreas = 50, betas = c(25, -0.029, 45.5),
 
 \item{nAreas}{the number of areas, default is 100}
 
-\item{betas}{vector containing betas for the estimation of th response}
+\item{betas}{vector of three containing betas for the estimation of the response}
 
 \item{fraction}{split between survey and census data (between 0 and 1)}
 }
@@ -22,7 +22,8 @@ Generates a list containing random \code{surveydata} and random \code{censusdata
 with lambda equal to the location. Next to an individual error a nested error is used to create the response.
 }
 \description{
-generateSAEdata
+Provides example data for ELLsea functions and returns 
+a survey and census dataset
 }
 \section{Functions}{
 \itemize{

@@ -10,29 +10,28 @@ Authors@R: c(person("Nikos", "Bosse", role = c("aut", "cre"),
 Author: Nikos Bosse [aut, cre], 
   Felix Suettmann [aut, cre]
 Maintainer: Nikos Bosse <nikos.bosse@stud.uni-goettingen.de>
-Description: The method for small area estimation added by this package is largely based on an approach developed 
-  by C. Elbers, J. Lanjouw and P. Lanjouw (2003). It can be used to impute a missing variable 
+Description: The method for small area estimation added by this package is 
+  largely based on an approach developed 
+  by C. Elbers, J. Lanjouw and P. Lanjouw (2003). It can be used to impute a 
+  missing variable 
   from a smaller survey dataset into a census. The imputation is based on a 
-  linear model and bootstrap samples from a normal distribution. As of now the correction for heteroscedasticity 
+  linear model and bootstrap samples from a normal distribution. As of now the 
+  correction for heteroscedasticity 
   is left omitted. 
 License: GPL-3
 LazyData: true
 RdMacros: Rdpack
 Imports: Rcpp (>= 0.12.18), 
-      RcppEigen (>= 0.3.3.4.0), 
-      doParallel, 
-      foreach, 
       data.table, 
-      bigstatsr, 
-      BH, 
-      Rdpack, 
       dqrng,
-      MASS
+      MASS,
+      stats
 LinkingTo: Rcpp, 
       RcppEigen, 
       bigstatsr, 
       BH, 
       dqrng
+Suggests: bigstatsr
 SystemRequirements: C++11
 References: None
 RoxygenNote: 6.1.0

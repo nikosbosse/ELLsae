@@ -43,11 +43,11 @@ END_RCPP
 void InfCensBigCpp(Environment fbm, const int n_bootstrap, const int n_obs_censusdata, const Eigen::Map<Eigen::VectorXd> locationeffects, const Eigen::Map<Eigen::VectorXd> residuals, const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> beta_sample, int userseed, int ncores);
 RcppExport SEXP _ELLsae_InfCensBigCpp(SEXP fbmSEXP, SEXP n_bootstrapSEXP, SEXP n_obs_censusdataSEXP, SEXP locationeffectsSEXP, SEXP residualsSEXP, SEXP XSEXP, SEXP beta_sampleSEXP, SEXP userseedSEXP, SEXP ncoresSEXP) {
 BEGIN_RCPP
-    Rcpp::traits::input_parameter< const int >::type n_bootstrap(n_bootstrapSEXP);
-    Rcpp::traits::input_parameter< Environment >::type fbm(fbmSEXP);
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type locationeffects(locationeffectsSEXP);
+    Rcpp::traits::input_parameter< Environment >::type fbm(fbmSEXP);
+    Rcpp::traits::input_parameter< const int >::type n_bootstrap(n_bootstrapSEXP);
     Rcpp::traits::input_parameter< const int >::type n_obs_censusdata(n_obs_censusdataSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type locationeffects(locationeffectsSEXP);
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type residuals(residualsSEXP);
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type beta_sample(beta_sampleSEXP);

@@ -18,13 +18,13 @@
 #include <random>
 
 // [[Rcpp::export(.InfCensCpp)]]
-Eigen::MatrixXd InfCensCpp(const int n_bootstrap,
-                           const int n_obs_censusdata, 
-                           const Eigen::Map<Eigen::VectorXd> locationeffects, 
-                           const Eigen::Map<Eigen::VectorXd> residuals,
-                           const Eigen::Map<Eigen::MatrixXd> X, 
-                           const Eigen::Map<Eigen::MatrixXd> beta_sample, 
-                           int userseed, int ncores) 
+SEXP InfCensCpp(const int n_bootstrap,
+                const int n_obs_censusdata, 
+                const Eigen::Map<Eigen::VectorXd> locationeffects, 
+                const Eigen::Map<Eigen::VectorXd> residuals,
+                const Eigen::Map<Eigen::MatrixXd> X, 
+                const Eigen::Map<Eigen::MatrixXd> beta_sample, 
+                int userseed, int ncores) 
 {
   
   // --------- create random sample of locations and of residuals --------- //
@@ -44,8 +44,6 @@ Eigen::MatrixXd InfCensCpp(const int n_bootstrap,
   // initialize and fill matrix for randam locations and residuals 
   Eigen::MatrixXd LocationEffectResiduals(n_obs_censusdata, n_bootstrap);
   
-  // int ncores = omp_get_max_threads() - 2;
-  
 #pragma omp parallel num_threads(ncores)
 {
   dqrng::xoshiro256plus lgen(gen);      // make thread local copy of rng 
@@ -64,7 +62,7 @@ Eigen::MatrixXd Xbeta = X * beta_sample;
 // ----- combine results ------- //
 Eigen::MatrixXd returnmatrix = Xbeta + LocationEffectResiduals;
 
-return returnmatrix;
+return Rcpp::wrap(returnmatrix);
 
 }
 
@@ -107,8 +105,6 @@ SEXP summaryParC(Eigen::MatrixXd x,
       double var = totalsquare / ncol - pow(mean,2);
       result(i,1) = var;
       result(i,2) = sqrt(var);
-      
-      
       
       std::nth_element(v.data() + indices[q] + 1,
                        v.data() + indices[q+1],
@@ -291,3 +287,28 @@ SEXP summaryBigCt(Eigen::MatrixXd x,
   // return Rcpp::wrap(v);
   return Rcpp::wrap(result);
 }
+
+
+
+
+// 
+// // [[Rcpp::export(.rowmeanParC)]]
+// SEXP rowmeanParC(Eigen::MatrixXd x, 
+//               int nrow, int ncol, int ncores) {
+//   Eigen::VectorXd out(nrow);
+//   
+// #pragma omp parallel num_threads(ncores)
+// {
+// #pragma omp for schedule(dynamic)
+//   for (int i = 0; i < nrow; i++) {
+//     double total = 0;
+//     for (int j = 0; j < ncol; j++) {
+//       total += x(i, j);
+//     }
+//     out[i] = total / ncol;
+//   }
+// }
+//   
+//   return Rcpp::wrap(out);
+// }
+

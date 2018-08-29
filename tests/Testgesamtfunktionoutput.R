@@ -10,14 +10,14 @@ rm(list = "helper") #delete helper
 mod <-  hh_inc ~ age + urban + rooms + sex + religion + race + adults + children
 loc <- "geo2_br"
 
-
+debugonce(ELLsae_base)
 
 library(ELLsae)
 library(profvis)
 
 #ohne Parallelisierung, ohne FBM
 prof <- profvis({
-  y <- ELLsae_base(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 50, seed = 5)
+  y <- ELLsae::ELLsae_base(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 50, seed = 5)
   y <- ELLsae_big(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 50, seed = 5)
 }); prof
 

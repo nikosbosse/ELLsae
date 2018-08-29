@@ -14,3 +14,6 @@
 }
 
 .summaryBigCt <- function(x, quantiles, nrow, ncol) {
+    .Call('_ELLsae_summaryBigCt', PACKAGE = 'ELLsae', x, quantiles, nrow, ncol)
+}
+

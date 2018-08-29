@@ -64,10 +64,11 @@
 
 
 ELLsae_big <- function(model, surveydata, censusdata, 
-                        location_survey,location_census, 
-                        mResponse, n_boot = 50, seed, welfare.function, 
-                        transf, transf_inv, output = "default", num_cores = 1, 
-                        quantiles = c(0, 0.25, 0.5, 0.75, 1)){
+                       location_survey,location_census, 
+                       mResponse, n_boot = 50, seed, welfare.function,
+                       transf, transf_inv, output = "default", num_cores = 1, 
+                       quantiles = c(0, 0.25, 0.5, 0.75, 1), 
+                       save_boot = F){
   
   
   # --------------------------------------------------------------------------------- #
@@ -81,6 +82,15 @@ ELLsae_big <- function(model, surveydata, censusdata,
   #       - n_obs_census)
   #   - computes means from the census for the regression of the survey dataset
   #     and adds them to the surveydataset to be included in the later regression
+  
+  # check whether bigstatsr is available
+  if(!requireNamespace("bigstatsr", quietly = TRUE)) {
+      stop("Package \"bigstatsr\" needed for this function to work. 
+           Please install it, e.g. run install.packages(bigstatsr)",call. = FALSE)
+    }
+  }
+  
+  ?requireNamespace
   
   
   ##### check whether n_boot was specified
@@ -285,6 +295,11 @@ ELLsae_big <- function(model, surveydata, censusdata,
     seed = as.numeric(Sys.time())
   }
   
+  
+  
+  
+  ###################################### Der Teil ist anders ######################################
+  
   bootstrap <- bigstatsr::FBM(nrow = n_obs_census, ncol = n_boot, type = "double")
   
   .InfCensBigCpp(fbm = bootstrap, 
@@ -292,7 +307,6 @@ ELLsae_big <- function(model, surveydata, censusdata,
                 locationeffects = location_effect, 
                 residuals = residuals(model_fit),
                 X = X_census, beta_sample = betas, userseed = seed, ncores = num_cores)
-  
   
   
   bigstatsr::big_apply(bootstrap,
@@ -304,21 +318,16 @@ ELLsae_big <- function(model, surveydata, censusdata,
                        fun = welfare.function)
   
   
-  
-  if(!missing(welfare.function)){
-    bootstrap <- welfare.function(bootstrap)
-  } 
+  ##################################################################################################
   
   
   
-  # # This is an indicator if the large yBoot matrix is supposed to be saved or not
-  # if(save_yboot == T){
-  #   fwrite(y_bootstrap, "Bootraps-of-Y.csv", sep = ",")
-  # }
-  
+  # This is an indicator if the large yBoot matrix is supposed to be saved or not
   
   output_list <- list()
   if(output == "default" | output == "all" | "summary" %in% output){
+    
+    ###################################### Der Teil ist anders ######################################
     tboot <- bigstatsr::big_transpose(bootstrap) 
     # big_apply works more efficiently columnwise
     summaryboot <- bigstatsr::big_apply(tboot,
@@ -333,6 +342,7 @@ ELLsae_big <- function(model, surveydata, censusdata,
                                         ncores = num_cores,
                                         fun = .summaryBigCt, q = quantiles,
                                         boot = n_boot)
+    ##################################################################################################
     
     colnames(summaryboot) <- c("mean", "var", "sd", paste(quantiles*100, "%-Quant", sep = ""))
     output_list$summary_boot <- summaryboot
@@ -349,14 +359,19 @@ ELLsae_big <- function(model, surveydata, censusdata,
   if(output == "default" | output == "all" | "census" %in% output){
     output_list$censusdata <- censusdata
   } 
-  
+  if(save_boot == T){
+    ##################################################################################################
+    bigstatsr::big_write(bootstrap, paste("BootstrapSampleELLsae-", Sys.Date(),  ".csv", sep = ""), 
+                         every_nrow = 2.5e+07/n_boot)
+    ##################################################################################################
+  }
   return(output_list)
 }
 
 
 
 
-
+?bigstatsr::big_write
 
 # summaryboot <- big_apply(tboot, 
 #                          a.FUN = function(X, ind, q){

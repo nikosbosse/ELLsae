@@ -13,7 +13,4 @@
     invisible(.Call('_ELLsae_InfCensBigCpp', PACKAGE = 'ELLsae', fbm, n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, userseed, ncores))
 }
 
-.summaryParC <- function(fbm, quantiles, nrow, ncol, ncores) {
-    .Call('_ELLsae_summaryParC', PACKAGE = 'ELLsae', fbm, quantiles, nrow, ncol, ncores)
-}
-
+.summaryBigCt <- function(x, quantiles, nrow, ncol) {

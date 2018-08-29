@@ -5,9 +5,9 @@
 \title{ELLsae_base}
 \usage{
 ELLsae_base(model, surveydata, censusdata, location_survey,
-  location_census, mResponse, n_boot = 50, seed, welfare.function,
+  location_census, clustermeans, n_boot = 50, seed, welfare.function,
   transf, transf_inv, output = "default", num_cores = 1,
-  quantiles = c(0, 0.25, 0.5, 0.75, 1))
+  quantiles = c(0, 0.25, 0.5, 0.75, 1), save_boot = F)
 }
 \arguments{
 \item{model}{a model that is specified for the relationship betwenn the 
@@ -22,13 +22,13 @@ imputed}
 
 \item{location_survey}{Name of location variable or vector for the survey 
 data which is used for error correction and the location means (if 
-\code{mResponse} is specified)}
+\code{clustermeans} is specified)}
 
 \item{location_census}{name of location variable (string) in the census data 
-which is used for error correction and location means. If \code{mResponse} 
+which is used for error correction and location means. If \code{clustermeans} 
 is specified, but \code{location_census} is missing}
 
-\item{mResponse}{Additional parameters for the regression based on location 
+\item{clustermeans}{Additional parameters for the regression based on location 
 means calculated from the census data to account for the lack of 
 information in a small survey}
 
@@ -50,7 +50,7 @@ The name is: ...}
 \value{
 The function takes the the typically smaller surveydata and uses the 
 argument \code{model} to estimate a linear model of the type \code{lm()}. In case
-the argument \code{mResponse} is specified means from the cluster data for the given 
+the argument \code{clustermeans} is specified means from the cluster data for the given 
 variables are calculated and merged with the survey databy cluster locations. These
 new explanatory variables are also used for the estimation of the linear model. 
 
@@ -68,7 +68,7 @@ the fit of the linear model \code{model_fit} and a summary of the bootstrap samp
 If \code{output} is specified all the arguments given are returned. Next to the 
 above the following inputs are possible, \code{surveydata} and \code{censusdata}
 return the data frames used for the compution as some rows might be deleted due 
-to NA handling and additional variables are created for \code{mResponse}. 
+to NA handling and additional variables are created for \code{clustermeans}. 
 
 Additionally the bootstrapped Y´s can be saved as a CSV if \code{save_yboot} is 
 set equal \code{TRUE} and can be found under the current working directory as 

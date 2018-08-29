@@ -31,10 +31,9 @@ LinkingTo: Rcpp,
       bigstatsr, 
       BH, 
       dqrng
-Suggests: bigstatsr
 SystemRequirements: C++11
 References: None
 RoxygenNote: 6.1.0
-Suggests: testthat
+Suggests: bigstatsr, testthat
 Depends: R (>= 3.1.0)
 Encoding: UTF-8

@@ -92,11 +92,8 @@ ELLsae_big <- function(model, surveydata, censusdata,
   if(!requireNamespace("bigstatsr", quietly = TRUE)) {
       stop("Package \"bigstatsr\" needed for this function to work. 
            Please install it, e.g. run install.packages(bigstatsr)",call. = FALSE)
-    }
   }
-  
-  ?requireNamespace
-  
+
   
   ##### check whether n_boot was specified
   if(missing(n_boot)){message(cat("As n_boot was not provided it was per default set to ", n_boot, sep = ""))}
@@ -375,8 +372,6 @@ ELLsae_big <- function(model, surveydata, censusdata,
 
 
 
-
-?bigstatsr::big_write
 
 # summaryboot <- big_apply(tboot, 
 #                          a.FUN = function(X, ind, q){

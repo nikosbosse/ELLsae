@@ -17,7 +17,8 @@
 #'   means calculated from the census data to account for the lack of 
 #'   information in a small survey 
 #' @param location_census name of location variable (string) in the census data 
-#'   which is used for error correction and location means. If \code{clustermeans} 
+#'   which is used for error correction and location means. 
+#'   If \code{clustermeans} 
 #'   is specified, but \code{location_census} is missing 
 #' @param n_boot Number of bootstrap samples used for the estimation, default is 
 #'   \code{n_boot = 50} 

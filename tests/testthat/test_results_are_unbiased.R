@@ -11,7 +11,7 @@ mfit <- lm(model, survdata)
 y_pred <- mfit$fitted.values
 
 test_that("the result is unbiased without any extra features", {
-  expect_equal(trunc(ELLsae::ELLsae_base(model = model, surveydata = survdata, censusdata = censdata, location_survey = "c", n_boot = 5000)),
+  expect_equal(trunc(ELLsae::ellsae(model = model, surveydata = survdata, censusdata = censdata, location_survey = "c", n_boot = 5000)),
                      trunc(y_pred))
 })
 

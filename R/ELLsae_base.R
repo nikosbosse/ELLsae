@@ -1,5 +1,5 @@
-#' @title ELLsae_base
-#' @description \code{ELLsae_base} is a method for small area estimation used to impute a missing 
+#' @title ellsae
+#' @description \code{ellsae} is a method for small area estimation used to impute a missing 
 #' variable from a smaller survey dataset into a census. The imputation is based 
 #' on a linear model and bootstrap samples. 
 #' 
@@ -68,12 +68,11 @@
 #' @export  
 
 
-ELLsae_base <- function(model, surveydata, censusdata, 
-                        location_survey,location_census, 
-                        clustermeans, n_boot = 50, seed, welfare.function, 
-                        transf, transf_inv, output = "default", num_cores = 1, 
-                        quantiles = c(0, 0.25, 0.5, 0.75, 1), 
-                        save_boot = F){
+ellsae <- function(model, surveydata, censusdata, location_survey,
+                   n_boot = 50, seed, welfare.function, transfy, transfy_inv, 
+                   output = "default", num_cores = 1, 
+                   quantiles = c(0, 0.25, 0.5, 0.75, 1), clustermeans, 
+                   location_census, save_boot = F){
   
   
   # --------------------------------------------------------------------------------- #
@@ -169,10 +168,10 @@ ELLsae_base <- function(model, surveydata, censusdata,
     na.omit(surveydata, cols = c(location_survey))
   } 
   
-  if(!missing(transf)){
-    if(missing(transf_inv)){
-      if(transf == log){
-        transf_inv <- exp
+  if(!missing(transfy)){
+    if(missing(transfy_inv)){
+      if(transfy == log){
+        transfy_inv <- exp
       } else {
         stop("if you want to transform the response variable with a function 
              different from 'log', you have to provide an inverse function for
@@ -180,7 +179,7 @@ ELLsae_base <- function(model, surveydata, censusdata,
       }
       }
     y <- all.vars(model)[1]
-    suveydata[, c(y) := transf(..y)]
+    suveydata[, c(y) := transfy(..y)]
       }
   
   
@@ -321,8 +320,8 @@ ELLsae_base <- function(model, surveydata, censusdata,
                              residuals = residuals(model_fit),
                              X = X_census, beta_sample = betas, userseed = seed, ncores = num_cores)
   
-  if(!missing(transf)){
-    bootstrap <- transf_inv(bootstrap)
+  if(!missing(transfy)){
+    bootstrap <- transfy_inv(bootstrap)
   }
   
   
@@ -338,7 +337,7 @@ ELLsae_base <- function(model, surveydata, censusdata,
   
   output_list <- list()
   if(output == "default" | output == "all" | "yboot" %in% output){
-    output_list$yboot <- rowMeans(bootstrap)
+    output_list$yboot_est <- rowMeans(bootstrap)
   }
   if(output == "default" | output == "all" | "summary" %in% output | "summary_boot" %in% output){
     summaryboot <- .summaryParC(bootstrap, quantiles = quantiles, 
@@ -348,7 +347,7 @@ ELLsae_base <- function(model, surveydata, censusdata,
     output_list$summary_boot <- summaryboot
   }
   if(output == "default" | output == "all" | "model_fit" %in% output){
-    output_list$lm_res_survey <- model_fit
+    output_list$model_fit <- model_fit
   }
   if(output == "all" | "bootsample" %in% output){
     output_list$bootsample <- bootstrap

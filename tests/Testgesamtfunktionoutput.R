@@ -1,4 +1,3 @@
-library(foreach)
 library(data.table)
 data <- SAE::househoulddatabrazil
 helper <- sample(x = 1:nrow(data), size = nrow(data)/5, replace = F)
@@ -10,19 +9,17 @@ rm(list = "helper") #delete helper
 mod <-  hh_inc ~ age + urban + rooms + sex + religion + race + adults + children
 loc <- "geo2_br"
 
-debugonce(ELLsae_base)
-
 library(ELLsae)
 library(profvis)
 
 #ohne Parallelisierung, ohne FBM
-prof <- profvis({
-  y <- ELLsae_base(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 250L, seed = 5, num_cores = 7)
+(prof <- profvis({
+  #y <- ellsae(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 250L, seed = 5, num_cores = 7)
+  y <- ELLsae_big(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 1000, seed = 5, num_cores = 7, welfare.function = identity)
+}))
 
-}); prof
+debugonce(ELLsae_big)
 
-
-y <- ELLsae_big(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 50, seed = 5)
 
 all(round(y$summary_boot[1:5,1:8], 6) == round(y2$summary_boot[1:5,1:8], 6))
 

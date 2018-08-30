@@ -302,7 +302,8 @@ ELLsae_big <- function(model, surveydata, censusdata,
   
   ###################################### Der Teil ist anders ######################################
   
-  bootstrap <- bigstatsr::FBM(nrow = n_obs_census, ncol = n_boot, type = "double")
+  # bootstrap <- bigstatsr::FBM(nrow = n_obs_census, ncol = n_boot, type = "double")
+  bootstrap <- bigstatsr::FBM(nrow = n_boot, ncol = n_obs_census, type = "double")
   
   .InfCensBigCpp(fbm = bootstrap, 
                 n_bootstrap = n_boot, n_obs_censusdata = n_obs_census,
@@ -310,40 +311,41 @@ ELLsae_big <- function(model, surveydata, censusdata,
                 residuals = residuals(model_fit),
                 X = X_census, beta_sample = betas, userseed = seed, ncores = num_cores)
   
+  if(!missing(welfare.function)){
+    bigstatsr::big_apply(bootstrap,
+                         a.FUN = function(bootstrap, ind, fun){
+                           bootstrap[,ind] <- fun(bootstrap[,ind])
+                           NULL
+                         }, 
+                         a.combine = 'c', ncores = 1, 
+                         fun = welfare.function)
+  }
   
-  bigstatsr::big_apply(bootstrap,
-                       a.FUN = function(bootstrap, ind, fun){
-                         bootstrap[,ind] <- fun(bootstrap[,ind])
-                         NULL
-                       }, 
-                       a.combine = 'c', ncores = num_cores, 
-                       fun = welfare.function)
   
   
   ##################################################################################################
   
   
   
-  # This is an indicator if the large yBoot matrix is supposed to be saved or not
-  
+
   output_list <- list()
   if(output == "default" | output == "all" | "summary" %in% output){
     
     ###################################### Der Teil ist anders ######################################
-    tboot <- bigstatsr::big_transpose(bootstrap) 
+    #tboot <- bigstatsr::big_transpose(bootstrap) 
     # big_apply works more efficiently columnwise
-    summaryboot <- bigstatsr::big_apply(tboot,
+    summaryboot <- bigstatsr::big_apply(bootstrap,
                                         a.FUN = function(bootstrap, ind,
-                                                         fun, q, boot) {
+                                                         fun, q, boot, c) {
 
                                           fun(x = bootstrap[,ind],
                                               quantiles = q, nrow = boot,
-                                              ncol = length(ind))
+                                              ncol = length(ind), ncores = c)
 
                                         }, a.combine = 'rbind',
-                                        ncores = num_cores,
-                                        fun = .summaryBigCt, q = quantiles,
-                                        boot = n_boot)
+                                        ncores = 1,
+                                        fun = .summaryBigParCt, q = quantiles,
+                                        boot = n_boot, c = num_cores)
     ##################################################################################################
     
     colnames(summaryboot) <- c("mean", "var", "sd", paste(quantiles*100, "%-Quant", sep = ""))

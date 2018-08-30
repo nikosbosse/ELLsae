@@ -6,21 +6,26 @@ library(ELLsae)
 
 context("Checks if all the objects in the general sae function body interact in the right way")
 
-surveydata <-  data.frame(a = c(1,2,4,5,6,7), b = c(2,3,4,1,4,1), c= c(2,4,3,1,5,7))
-censusdata <-  data.frame(a = c(1,2,6,7,5,1,39,6), b = c(2,3,6,3,4,7,2,8), c= c(2,4,5,1,8,9,6,4))
+surveydata <-  data.frame(a = c(1,2,4,5,6,7), 
+                          b = c(2,3,4,1,4,1), c= c(2,4,3,1,5,7))
+censusdata <-  data.frame(a = c(1,2,6,7,5,1,39,6), 
+                          b = c(2,3,6,3,4,7,2,8), c= c(2,4,5,1,8,9,6,4))
 model <- a ~ b + c
 location_survey <- "c"
 
 test_that("the function works", {
-  expect_equal(length(ELLsae_base(model, surveydata , censusdata, location_survey, n_boot = 5, welfare.function = identity)),8)
+  expect_equal(length(ellsae(model, surveydata , censusdata, 
+                             location_survey, n_boot = 5, 
+                             welfare.function = identity)$yboot_est),
+               8)
 
 })
 
 # -------------- welfare functions ------------------ #
 
 test_that("different welfare functions can be introduced", {
-  expect_equal(length(ELLsae_base(model, surveydata , censusdata, location_survey, n_boot = 5, welfare.function = function(x){2*x})),8)
-  expect_equal(length(ELLsae_base(model, surveydata , censusdata, location_survey, n_boot = 5, welfare.function = function(x){log(x^2 + 2)})),8)
+  expect_equal(length(ellsae(model, surveydata , censusdata, location_survey,n_boot = 5, welfare.function = function(x){2*x})),8)
+  expect_equal(length(ellsae(model, surveydata , censusdata, location_survey, n_boot = 5, welfare.function = function(x){log(x^2 + 2)})),8)
 })
 
 
@@ -31,33 +36,39 @@ test_that("different welfare functions can be introduced", {
 context("Testing whether the function handles inputs the way it is supposed to be")
 
 test_that("the function handles inputs for surveydata correctly", {
-  expect_equal(length(ELLsae_base(model, as.matrix(surveydata) , censusdata, location_survey, n_boot = 5, welfare.function = identity)),8)
-  expect_error(length(ELLsae_base(model = model, censusdata = censusdata,
+  expect_equal(length(ellsae(model, as.matrix(surveydata) , censusdata, 
+                             location_survey, n_boot = 5, 
+                             welfare.function = identity)$yboot_est),
+               8)
+  expect_error(length(ellsae(model = model, censusdata = censusdata,
                              location_survey = location_survey, n_boot = 5)),
                "Data frame with the surveydata is missing")
 })
 
 test_that("the function handles inputs for censusdata correctly", {
-  expect_equal(length(ELLsae_base(model, surveydata , as.matrix(censusdata), location_survey, n_boot = 5, welfare.function = identity)),8)
-  expect_error(length(ELLsae_base(model = model, surveydata = surveydata,
+  expect_equal(length(ellsae(model, surveydata, 
+                             as.matrix(censusdata), location_survey, n_boot = 5, 
+                             welfare.function = identity)$yboot_est),
+               8)
+  expect_error(length(ellsae(model = model, surveydata = surveydata,
                              location_survey = location_survey, n_boot = 5)),
                "Data frame with the censusdata is missing")
 })
 
 test_that("the function handles inputs for locations correctly", {
   # input: string = variable name
-  expect_equal(length(ELLsae_base(model, surveydata , censusdata, location_survey = "c",
+  expect_equal(length(ellsae(model, surveydata , censusdata, location_survey = "c",
                              n_boot = 5)),8)
   # input: location vector missing
-  expect_error(length(ELLsae_base(model, surveydata , censusdata, n_boot = 5)),
+  expect_error(length(ellsae(model, surveydata , censusdata, n_boot = 5)),
                "you have to provide either 1) a vector of locations of length corresponding to the number of observations in the survey data or 2) a string with the name of a variable in the surveydata that provides the locations of individual observations")
   # input: string = not a variable name
-  expect_error(length(ELLsae_base(model, surveydata , censusdata, location_survey = "d",
+  expect_error(length(ellsae(model, surveydata , censusdata, location_survey = "d",
                              n_boot = 5)),
                "String that was specified as variable name for the location is not the name of one of the variables in the survey data set.")
-  # numeric vector of length not corresponding to number of observations
-  
 })
+
+
 
 # Tests für mResponse:
 # er meckert, wenn er kein census_location als String bekommt, oder die Variablennamen gleich sind
@@ -138,3 +149,16 @@ test_that("manually taking a sample of x'beta, e.g. the mean of the randomly dra
 })
 
 
+# test_that("ys converge to lm-ys", {
+#   expect_equal(round(rowMeans(ellsae(surveydata = )
+#     
+#     
+#   ),1)
+#                ,round(predict.lm(m5, newdata = censusdata),1))
+# })
+# 
+# ellsae <- function(model, surveydata, censusdata, location_survey,
+#                    n_boot = 50, seed, welfare.function, transfy, transfy_inv, 
+#                    output = "default", num_cores = 1, 
+#                    quantiles = c(0, 0.25, 0.5, 0.75, 1), clustermeans, 
+#                    location_census, save_boot = F)

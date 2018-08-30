@@ -1,14 +1,7 @@
-<<<<<<< HEAD
-#' @title ELLsae_base
-#' @description \code{ELLsae_base} is a method for small area estimation used 
-#' to impute a missing variable from a smaller survey dataset into a census. 
-#' The imputation is based on a linear model and bootstrap samples. 
-=======
 #' @title ellsae
-#' @description \code{ellsae} is a method for small area estimation used to impute a missing 
-#' variable from a smaller survey dataset into a census. The imputation is based 
-#' on a linear model and bootstrap samples. 
->>>>>>> b37178441643a121ed6d013d33709141cbbe092b
+#' @description \code{ellsae} is a method for small area estimation used to 
+#' impute a missing variable from a smaller survey dataset into a census. 
+#' The imputation is based on a linear model and bootstrap samples. 
 #' 
 #' @param model a model that is specified for the relationship betwenn the 
 #'   response varibale and the regressors. Model must be a linear model that can 

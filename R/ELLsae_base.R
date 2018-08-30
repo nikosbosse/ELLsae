@@ -368,14 +368,9 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
                            X = X_census, beta_sample = betas, userseed = seed, 
                            ncores = num_cores)
   
-<<<<<<< HEAD
-  # Backtransformation if transformation was choosen
-  if(!missing(transf)){
-    bootstrap <- transf_inv(bootstrap)
-=======
+
   if(!missing(transfy)){
     bootstrap <- transfy_inv(bootstrap)
->>>>>>> b37178441643a121ed6d013d33709141cbbe092b
   }
   
   # Runs the welfare funcation over the boostrap response variable Y

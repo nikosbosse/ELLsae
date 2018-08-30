@@ -13,6 +13,23 @@
 #' @param location_survey Name of location variable or vector for the survey 
 #'   data which is used for error correction and the location means (if 
 #'   \code{clustermeans} is specified) 
+#' 
+#' @param n_boot Number of bootstrap samples used for the estimation, default is 
+#'   \code{n_boot = 50} 
+#' @param seed to make research reproducible a seed can be set. Simple 
+#' \code{set.seed()} in R wont work as functions run in \code{C++}.
+#' @param welfare.function Additionally a welfare function for the response can 
+#'   be specified 
+#' @param transfy function to transform the response y in the model
+#' @param transfy_inv function for backtransformation of \code{transf}
+#' @param output as "default" a list with ... is returned. Write "all" for all
+#' possible outputs or specify outputs yourself in a vector.
+#' @param num_cores utilizes the given number of cores to speed up the 
+#' estimation. The number of cores can be determined by 
+#' parallel::detectCores() - 1 or bigstatsr::nb_cores() that returnes only
+#' physical cores. 
+#' @param quantiles vector of requested quantiles for the \code{summaryboot}
+#' output as decimals between 0 and 1.
 #' @param clustermeans Additional parameters for the regression based on 
 #' location means calculated from the census data to account for the lack of 
 #' information in a small survey 
@@ -20,28 +37,10 @@
 #'   which is used for error correction and location means. 
 #'   If \code{clustermeans} 
 #'   is specified, but \code{location_census} is missing 
-#' @param n_boot Number of bootstrap samples used for the estimation, default is 
-#'   \code{n_boot = 50} 
-#' @param welfare.function Additionally a welfare function for the response can 
-#'   be specified 
-#' @param parallel indicates if compution is supposed to be done in parallel to 
-#'   improve speed 
-#' @param output indicator for which output is requested as a list.
-#' @param save_yboot logical indicator if the bootraps of the response y are 
+#' @param save_boot logical indicator if the bootraps of the response y are 
 #' supposed to be saved as a CSV file under your current working direktory. 
 #' The name is: ...
-#' @param num_cores utilizes the given number of cores to speed up the 
-#' estimation. The number of cores can be determined by 
-#' parallel::detectCores() - 1 or bigstatsr::nb_cores() that returnes only
-#' physical cores. 
-#' @param quantiles vector of requested quantiles for the \code{summaryboot}
-#' output as decimals between 0 and 1.
-#' @param transf function to transform the response y in the model
-#' @param transf_inv function for backtransformation of \code{transf}
-#' @param seed to make research reproducible a seed can be set. Simple 
-#' \code{set.seed()} in R wont work as functions run in \code{C++}.
-#' @param output as "default" a list with ... is returned. Write "all" for all
-#' possible outputs or specify outputs yourself in a vector.
+#' 
 #' @return The function takes the the typically smaller surveydata and uses the 
 #' argument \code{model} to estimate a linear model of the type \code{lm()}. 
 #' In case the argument \code{clustermeans} is specified means from the cluster 

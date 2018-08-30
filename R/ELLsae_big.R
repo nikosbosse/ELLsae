@@ -1,5 +1,5 @@
-#' @title ELLsae_base
-#' @description \code{ELLsae_base} is a method for small area estimation used to
+#' @title ELLsae_big
+#' @description \code{ELLsae_big} is a method for small area estimation used to
 #'  impute a missing 
 #' variable from a smaller survey dataset into a census. The imputation is based 
 #' on a linear model and bootstrap samples. 

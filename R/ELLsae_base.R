@@ -13,11 +13,11 @@
 #' @param location_survey Name of location variable or vector for the survey 
 #'   data which is used for error correction and the location means (if 
 #'   \code{clustermeans} is specified) 
-#' 
 #' @param n_boot Number of bootstrap samples used for the estimation, default is 
 #'   \code{n_boot = 50} 
 #' @param seed to make research reproducible a seed can be set. Simple 
 #' \code{set.seed()} in R wont work as functions run in \code{C++}.
+#' Seed is again randomized after running the function.
 #' @param welfare.function Additionally a welfare function for the response can 
 #'   be specified 
 #' @param transfy function to transform the response y in the model
@@ -35,12 +35,12 @@
 #' information in a small survey 
 #' @param location_census name of location variable (string) in the census data 
 #'   which is used for error correction and location means. 
-#'   If \code{clustermeans} 
-#'   is specified, but \code{location_census} is missing 
-#' @param save_boot logical indicator if the bootraps of the response y are 
+#'   If \code{clustermeans} has an a variable and
+#'   \code{location_census} is missing, name of the \code{location_survey}
+#'   variable is tried.
+#' @param save_boot logical indicator if the bootstraps of the response y are 
 #' supposed to be saved as a CSV file under your current working direktory. 
-#' The name is: ...
-#' 
+#' The name is: BootstrapSampleELLsae-DATE.csv
 #' @return The function takes the the typically smaller surveydata and uses the 
 #' argument \code{model} to estimate a linear model of the type \code{lm()}. 
 #' In case the argument \code{clustermeans} is specified means from the cluster 
@@ -75,7 +75,7 @@
 #' "Bootraps-of-Y.csv". 
 #' @seealso Other small area estimation methods can also be found 
 #' in the package \code{sae}. 
-#' @keywords SAE, imputation 
+#' @keywords SAE, imputation, ELLsea_base 
 #' @references 
 #'   Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003). 
 #'   \emph{Micro-Level Estimation of Poverty and Inequality}. 
@@ -84,12 +84,42 @@
 #'   Guadarrama Sanz, M., Molina, I., and Rao, J.N.K.  (2016). 
 #'   \emph{A comparison of small area estimation methods for poverty mapping}. 
 #'   In: 17 (Mar. 2016), 41-66 and 156 and 158.
-#' @examples mean(c(1,2,3,4))
+#'@examples 
+#'# How to split the data for an example
+#'
+#'brazil <- data(brazil)
+#'
+#'# generate indexes for the rows to keep. order indexes to keep. 
+#'helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = F)
+#'helper <- sort(helper)
+#'
+#'#create survey and census set from the originial data using the indexes
+#'survey <- brazil[helper,]
+#'census <- brazil[-helper,]
+#'
+#'#remove the helper vector
+#'rm(list = "helper")
+#'model.example <- hh_inc ~ geo2_br + age + sex + computer + trash
+#'
+#'ellsae(model = model.example, 
+#'         surveydata = survey, 
+#'         censusdata = census, 
+#'         location_survey = "geo2_br",
+#'         n_boot = 250L, 
+#'         seed = 1234, 
+#'         transfy = log, 
+#'         transfy_inv = exp, 
+#'         output = "all", 
+#'         num_cores = 1, 
+#'         quantiles = c(0, 0.25, 0.5, 0.75, 1), 
+#'         clustermeans = "age", 
+#'         location_census = "geo2_br", 
+#'         save_boot = F)
 #' @export  
 
 
 ellsae <- function(model, surveydata, censusdata, location_survey,
-                   n_boot = 50, seed, welfare.function, transfy, transfy_inv, 
+                   n_boot = 50L, seed, welfare.function, transfy, transfy_inv, 
                    output = "default", num_cores = 1, 
                    quantiles = c(0, 0.25, 0.5, 0.75, 1), clustermeans, 
                    location_census, save_boot = F){
@@ -225,7 +255,7 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
     if(!all(unique(surveydata[, ..location_survey]) %in% 
             unique(censusdata[,..location_census]))){
       stop("All locations that appear in the survey data must also appear 
-           in the census data")
+           in the census data, there might also be missing values")
     }
     if(any(is.na(censusdata[, ..location_census]))){ 
       stop("The locations in the census are not allowed to have missing values 
@@ -256,8 +286,8 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
     }
     if(!all(clustermeans %in%  names(censusdata))){
       stop("your input for clustermeans includes variables that are not present 
-           in the censusdata set.Means for those variables 
-           cannot be calculated")
+           in the censusdata set. Means for those variables cannot be 
+           calculated")
     }
     if(!all( clustermeans %in%  names(surveydata))){
       warning("your input for clustermeans includes variables that are not 

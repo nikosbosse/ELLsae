@@ -2,7 +2,7 @@
 % Please edit documentation in R/ELLsae_big.R
 \name{ELLsae_big}
 \alias{ELLsae_big}
-\title{ELLsae_base}
+\title{ELLsae_big}
 \usage{
 ELLsae_big(model, surveydata, censusdata, location_survey, location_census,
   mResponse, n_boot = 50, seed, welfare.function, transf, transf_inv,
@@ -75,7 +75,7 @@ set equal \code{TRUE} and can be found under the current working directory as
 "Bootraps-of-Y.csv".
 }
 \description{
-\code{ELLsae_base} is a method for small area estimation used to
+\code{ELLsae_big} is a method for small area estimation used to
  impute a missing 
 variable from a smaller survey dataset into a census. The imputation is based 
 on a linear model and bootstrap samples.

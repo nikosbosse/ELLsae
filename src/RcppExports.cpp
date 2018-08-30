@@ -57,9 +57,9 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// summaryBigCt
-SEXP summaryBigCt(Eigen::MatrixXd x, Eigen::VectorXd quantiles, int nrow, int ncol);
-RcppExport SEXP _ELLsae_summaryBigCt(SEXP xSEXP, SEXP quantilesSEXP, SEXP nrowSEXP, SEXP ncolSEXP) {
+// summaryBigParCt
+SEXP summaryBigParCt(Eigen::MatrixXd x, Eigen::VectorXd quantiles, int nrow, int ncol, int ncores);
+RcppExport SEXP _ELLsae_summaryBigParCt(SEXP xSEXP, SEXP quantilesSEXP, SEXP nrowSEXP, SEXP ncolSEXP, SEXP ncoresSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -67,7 +67,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type quantiles(quantilesSEXP);
     Rcpp::traits::input_parameter< int >::type nrow(nrowSEXP);
     Rcpp::traits::input_parameter< int >::type ncol(ncolSEXP);
-    rcpp_result_gen = Rcpp::wrap(summaryBigCt(x, quantiles, nrow, ncol));
+    Rcpp::traits::input_parameter< int >::type ncores(ncoresSEXP);
+    rcpp_result_gen = Rcpp::wrap(summaryBigParCt(x, quantiles, nrow, ncol, ncores));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -76,7 +77,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_ELLsae_InfCensCpp", (DL_FUNC) &_ELLsae_InfCensCpp, 8},
     {"_ELLsae_summaryParC", (DL_FUNC) &_ELLsae_summaryParC, 5},
     {"_ELLsae_InfCensBigCpp", (DL_FUNC) &_ELLsae_InfCensBigCpp, 9},
-    {"_ELLsae_summaryBigCt", (DL_FUNC) &_ELLsae_summaryBigCt, 4},
+    {"_ELLsae_summaryBigParCt", (DL_FUNC) &_ELLsae_summaryBigParCt, 5},
     {NULL, NULL, 0}
 };
 

@@ -36,15 +36,20 @@
 #' physical cores. 
 #' @param quantiles vector of requested quantiles for the \code{summaryboot}
 #' output as decimals between 0 and 1.
+#' @param transf function to transform the response y in the model
+#' @param transf_inv function for backtransformation of \code{transf}
+#' @param seed to make research reproducible a seed can be set. Simple 
+#' \code{set.seed()} in R wont work as functions run in \code{C++}.
+#' @param output as "default" a list with ... is returned. Write "all" for all
+#' possible outputs or specify outputs yourself in a vector.
 #' @return The function takes the the typically smaller surveydata and uses the 
 #' argument \code{model} to estimate a linear model of the type \code{lm()}. 
 #' In case the argument \code{clustermeans} is specified means from the cluster 
 #' data for the given variables are calculated and merged with the survey 
 #' data by cluster locations. These new explanatory variables are also used for 
-#' the estimation of the linear 
-#' model. 
+#' the estimation of the linear model. 
 #' 
-#' In the second step a C++ fuction takes over and calculates \code{nboot} 
+#' In the second step a C++ fuction takes over and calculates \code{n_boot} 
 #' predicted Y´s by using the betas from the first step to draw from a 
 #' multivariate normal distributionand draws indicidual and nested errors at 
 #' random with replacement. If requested the Y´s are used to estimate the 

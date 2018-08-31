@@ -88,25 +88,6 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
   #     and adds them to the surveydataset to be included in the later regression
   
   
-  ##### check whether n_boot was specified
-  if(missing(n_boot)){
-    message(cat("As n_boot was not provided it was per default set to ", n_boot, sep = ""))
-  } 
-  if(!(length(n_boot) == 1)){
-    stop("n_boot has to be provided as single integer")
-  } 
-  if(!is.integer(n_boot)){
-    n_boot <- try(as.integer(n_boot))
-    if(class(n_boot) == "try-error"){
-      stop("n_boot has to be provided as single integer")
-    } else {
-      warning("n_boot was not provided as integer and has 
-               been coerced to integer by ELLsae")
-    }
-  }
-    
-  
-  
   ##### check whether model is specified correctly and if not try to correct 
   if(missing(model)){stop("A model has to be specified")}
   if(class(model) != "formula"){
@@ -115,7 +96,7 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
       stop("model must either be provided as a formula or as a string.
            See ?formula for help")
     }
-  }
+    }
   
   ##### check whether surveydata is specified correctly and try to correct
   if(missing(surveydata)) stop("Input surveydata is missing")
@@ -148,7 +129,8 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
           that are not included in the censusdata")
   }
   n_obs_census <- nrow(censusdata)
- 
+  
+  
   ##### check whether the locations are specified correctly and try to correct
   if(missing(location_survey)) {
     stop("you have to provide a string with the variable indicating the
@@ -168,19 +150,92 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
     na.omit(surveydata, cols = c(location_survey))
   } 
   
-  if(!missing(transfy)){
-    if(missing(transfy_inv)){
-      if(transfy == log){
+  
+  ##### check whether n_boot was specified
+  if(missing(n_boot)){
+    message(cat("As n_boot was not provided it was per default set to ", n_boot, sep = ""))
+  } 
+  if(length(n_boot) != 1){
+    stop("n_boot has to be provided as single integer")
+  } 
+  if(!is.integer(n_boot)){
+    n_boot <- try(as.integer(n_boot))
+    if(class(n_boot) == "try-error"){
+      stop("n_boot has to be provided as single integer")
+    } 
+  }
+  
+  ##### check whether seed was specified
+  if(length(seed) != 1){
+    stop("If you want to set a seed it has to be provided as single integer")
+  } 
+  if(!is.integer(seed)){
+    seed <- try(as.integer(seed))
+    if(class(seed) == "try-error"){
+      stop("If you want to set a seed it has to be provided as single integer")
+    } 
+  }
+  # as the function sets a seed, save the internal seed and restore it later
+  if(!missing(seed)){
+    runif(1) # make sure R sets seed internally
+    previousseed <- .Random.seed
+    on.exit( { .Random.seed <<- previousseed } )
+    set.seed(seed)
+  } else {
+    seed <- as.numeric(Sys.time()) # seed needd for C++
+  }
+  
+  
+  welfare.function
+  if (!missing(transfy)) {
+    if (missing(transfy_inv)) {
+      if (transfy == log) {
         transfy_inv <- exp
       } else {
-        stop("if you want to transform the response variable with a function 
-             different from 'log', you have to provide an inverse function for
-             backtransformation of the bootstrap sample")
+        stop(
+          "if you want to transform the response variable with a function
+          different from 'log', you have to provide an inverse function for
+          backtransformation of the bootstrap sample"
+        )
       }
-      }
+    }
     y <- all.vars(model)[1]
     suveydata[, c(y) := transfy(..y)]
-      }
+  }
+  
+  #### check whether output was correctly specified
+  if (!is.character(output)){
+    stop("your input for character should eiher be 'all', 'default', or a 
+         vector with the outputs you want, e.g. c('summary', 'yboot')")
+  }
+  
+  ##### check whether num_cores was correctly specified
+  if(length(num_cores) != 1){
+    stop("The number of cores to use has to be provided as single integer")
+  } 
+  if(!is.integer(num_cores)){
+    num_cores <- try(as.integer(num_cores))
+    if(class(num_cores) == "try-error"){
+      stop("The number of cores to use has to be provided as single integer")
+    } 
+  }
+  
+  quantiles <- try(as.numeric(quantiles)) #must be done to pass to C++
+  if (class(quantiles) == "try-error"){
+    stop("quantiles must be provided as an ascending vector of numbers 
+         between 0 and 1")
+  }
+  if (any(is.na(quantiles))){
+    stop("quantiles must be provided as an ascending vector of numbers 
+         between 0 and 1")
+  }
+  if (any(quantiles) < 0 | any(quantiles) > 1){
+    quantiles <- quantiles[-which(quantiles < 0 | quantiles > 1)]
+    warning("quantiles < 0 and >1 are automatically omitted")
+  }
+  if (length(quantiles) == 0){
+    quantiles <- c(0.5) # can't pass vector of length 0 to C++
+  }
   
   
   #### check if input for clustermeans is valid and reformat
@@ -248,6 +303,8 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
   }
 
   
+  
+  
   # --------------------------------------------------------------------------------- #
   # ----------------------------- inference survey ---------------------------------- #
   # --------------------------------------------------------------------------------- #
@@ -297,15 +354,6 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
     attributes(X_census)[-1] <- NULL
   }
   
-  
-  if(!missing(seed)){
-    runif(1) # make sure R sets seed internally
-    previousseed <- .Random.seed
-    on.exit( { .Random.seed <<- previousseed } )
-    set.seed(seed)
-  } else {
-    seed <- as.numeric(Sys.time())
-  }
   
   betas <- t(MASS::mvrnorm(n = n_boot,
                            mu = coefficients(model_fit),

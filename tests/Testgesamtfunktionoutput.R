@@ -18,8 +18,6 @@ library(profvis)
   y <- ELLsae_big(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 1000, seed = 5, num_cores = 7, welfare.function = identity)
 }))
 
-debugonce(ELLsae_big)
-
 
 all(round(y$summary_boot[1:5,1:8], 6) == round(y2$summary_boot[1:5,1:8], 6))
 

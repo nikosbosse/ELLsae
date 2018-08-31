@@ -292,6 +292,10 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
   quantiles <- sort(quantiles) # sort anyway to be sure for C++
 
   
+  
+  
+  ######## clustermeans #######
+  
   #### check if input for clustermeans is valid and reformat
   if(!missing(clustermeans)){
     # if clustermeans is used we need a string with the census location

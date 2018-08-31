@@ -366,7 +366,7 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
   }
   
   return(output_list)
-    }
+}
 
 
 

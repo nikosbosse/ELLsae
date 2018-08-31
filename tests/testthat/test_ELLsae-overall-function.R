@@ -4,12 +4,15 @@ library(ELLsae)
 # -------------- function works ------------------ #
 # ------------------------------------------------ #
 
-context("Checks if all the objects in the general sae function body interact in the right way")
+context("Checks if all the objects in the general sae function body interact 
+        in the right way")
 
 surveydata <-  data.frame(a = c(1,2,4,5,6,7), 
-                          b = c(2,3,4,1,4,1), c= c(2,4,3,1,5,7))
+                          b = c(2,3,4,1,4,1), 
+                          c= c(2,4,3,1,5,7))
 censusdata <-  data.frame(a = c(1,2,6,7,5,1,39,6), 
-                          b = c(2,3,6,3,4,7,2,8), c= c(2,4,5,1,8,9,6,4))
+                          b = c(2,3,6,3,4,7,2,8), 
+                          c= c(2,4,5,1,8,9,6,4))
 model <- a ~ b + c
 location_survey <- "c"
 
@@ -24,8 +27,12 @@ test_that("the function works", {
 # -------------- welfare functions ------------------ #
 
 test_that("different welfare functions can be introduced", {
-  expect_equal(length(ellsae(model, surveydata , censusdata, location_survey,n_boot = 5, welfare.function = function(x){2*x})),8)
-  expect_equal(length(ellsae(model, surveydata , censusdata, location_survey, n_boot = 5, welfare.function = function(x){log(x^2 + 2)})),8)
+  expect_equal(length(ellsae(model, surveydata , censusdata, location_survey,
+                             n_boot = 5, seed = 1234, 
+                             welfare.function = function(x){2*x})),8)
+  expect_equal(length(ellsae(model, surveydata , censusdata, location_survey, 
+                             n_boot = 5, 
+                             welfare.function = function(x){log(x^2 + 2)})),8)
 })
 
 
@@ -33,7 +40,8 @@ test_that("different welfare functions can be introduced", {
 
 # -------------- inputs ------------------ #
 
-context("Testing whether the function handles inputs the way it is supposed to be")
+context("Testing whether the function handles inputs 
+        the way it is supposed to be")
 
 test_that("the function handles inputs for surveydata correctly", {
   expect_equal(length(ellsae(model, as.matrix(surveydata) , censusdata, 
@@ -57,7 +65,8 @@ test_that("the function handles inputs for censusdata correctly", {
 
 test_that("the function handles inputs for locations correctly", {
   # input: string = variable name
-  expect_equal(length(ellsae(model, surveydata , censusdata, location_survey = "c",
+  expect_equal(length(ellsae(model, surveydata , censusdata, 
+                             location_survey = "c",
                              n_boot = 5)),8)
   # input: location vector missing
   expect_error(length(ellsae(model, surveydata , censusdata, n_boot = 5)),
@@ -100,8 +109,16 @@ predictionELLsae <- function(model, surveydata1 = surveydata, censusdata1 = cens
 }
 
 
-surveydata <- data.frame(y = 1:5, a = c(2,6,3,4,2), b = c(5,8,5,1,5), c = c(5,9,3,5,4), loc = c(1,2,1,2,3))
-censusdata <- data.frame(y = 4:9, a = 14:19, b = 24:29, c = 25:30, loc = c(1,1,3,1,2,2))
+surveydata <- data.frame(y = 1:5, 
+                         a = c(2,6,3,4,2), 
+                         b = c(5,8,5,1,5), 
+                         c = c(5,9,3,5,4), 
+                         loc = c(1,2,1,2,3))
+censusdata <- data.frame(y = 4:9, 
+                         a = 14:19, 
+                         b = 24:29, 
+                         c = 25:30, 
+                         loc = c(1,1,3,1,2,2))
 
 model1 <- y ~ b + a; m1 <- lm(model1, surveydata)
 model2 <- y ~ b + a; m2 <- lm(model2, surveydata)
@@ -110,7 +127,8 @@ model4 <- y ~ b^2 + (a); m4 <- lm(model4, surveydata)
 model5 <- y ~ b + log(a); m5 <- lm(model5, surveydata)
 model6 <- y ~ b*a; m6 <- lm(model6, surveydata)
 
-test_that("the manual prediction approach works correctly for different models", {
+test_that("the manual prediction approach works 
+          correctly for different models", {
   expect_equal(predictionELLsae(model1), predict.lm(m1, newdata = censusdata))
   expect_equal(predictionELLsae(model2), predict.lm(m2, newdata = censusdata))
   expect_equal(predictionELLsae(model3), predict.lm(m3, newdata = censusdata))
@@ -122,7 +140,8 @@ test_that("the manual prediction approach works correctly for different models",
 
 
 
-predictionELLsae_bootstrap <- function(model, surveydata1 = surveydata, censusdata1 = censusdata){
+predictionELLsae_bootstrap <- function(model, surveydata1 = surveydata, 
+                                       censusdata1 = censusdata){
   model_fit <- lm(model, surveydata1)
 
   p <- model_fit$rank
@@ -143,7 +162,8 @@ predictionELLsae_bootstrap <- function(model, surveydata1 = surveydata, censusda
 }
 
 
-test_that("manually taking a sample of x'beta, e.g. the mean of the randomly drawn y_pred converges to the true predicted values", {
+test_that("manually taking a sample of x'beta, e.g. the mean of the 
+          randomly drawn y_pred converges to the true predicted values", {
   expect_equal(round(rowmeanC(predictionELLsae_bootstrap(model5)),1)
                ,round(predict.lm(m5, newdata = censusdata),1))
 })

@@ -278,12 +278,19 @@ void InfCensBigCpp(Environment fbm, const int n_bootstrap,
 
 
 
+
 // [[Rcpp::export(.summaryBigParCt)]]
-SEXP summaryBigParCt(Eigen::MatrixXd x,
+SEXP summaryBigParCt(Environment fbm,
                   Eigen::VectorXd quantiles,
-                  int nrow, int ncol, int ncores) {
+                  int nrow, int ncol, int ncores){
+  
+  XPtr<FBM> xpMat = fbm["address"];
+  BMAcc<double> macc(xpMat);
+  
   const int no_quantiles = quantiles.size();
   Eigen::MatrixXd result(ncol, no_quantiles + 3);
+  
+  
   int indices[no_quantiles +1];
   indices[0] = -1;
   for (int k=0; k<no_quantiles; k++){
@@ -297,15 +304,14 @@ SEXP summaryBigParCt(Eigen::MatrixXd x,
   {
   #pragma omp for schedule(dynamic)
     for (int j = 0; j < ncol; j++){
-      Eigen::VectorXd v = x.col(j);
       for (int q = 0; q < no_quantiles; ++q) {
         
         double total = 0;
         double totalsquare = 0;
         
         for (int i = 0; i < nrow; i++){
-          total += x(i,j);
-          totalsquare += pow(x(i,j),2);
+          total += macc(i,j);
+          totalsquare += pow(macc(i,j),2);
         }
         
         double mean = total / nrow;
@@ -314,10 +320,10 @@ SEXP summaryBigParCt(Eigen::MatrixXd x,
         result(j,1) = var;
         result(j,2) = sqrt(var);
         
-        std::nth_element(v.data() + indices[q] + 1,
-                         v.data() + indices[q+1],
-                                           v.data() + v.size());
-        result(j,q + 3) = v[indices[q+1]];
+        std::nth_element(&macc(0,j) + indices[q] + 1,
+                         &macc(0,j) + indices[q+1],
+                         &macc(0,j+1));
+        result(j,q + 3) = macc(indices[q+1],j);
       }
     }
   }
@@ -401,4 +407,8 @@ SEXP summaryBigParCt(Eigen::MatrixXd x,
 //   
 //   return Rcpp::wrap(out);
 // }
+
+
+
+
 

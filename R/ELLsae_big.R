@@ -333,18 +333,20 @@ ELLsae_big <- function(model, surveydata, censusdata,
     ###################################### Der Teil ist anders ######################################
     #tboot <- bigstatsr::big_transpose(bootstrap) 
     # big_apply works more efficiently columnwise
-    summaryboot <- bigstatsr::big_apply(bootstrap,
-                                        a.FUN = function(bootstrap, ind,
-                                                         fun, q, boot, c) {
-
-                                          fun(x = bootstrap[,ind],
-                                              quantiles = q, nrow = boot,
-                                              ncol = length(ind), ncores = c)
-
-                                        }, a.combine = 'rbind',
-                                        ncores = 1,
-                                        fun = .summaryBigParCt, q = quantiles,
-                                        boot = n_boot, c = num_cores)
+    # summaryboot <- bigstatsr::big_apply(bootstrap,
+    #                                     a.FUN = function(bootstrap, ind,
+    #                                                      fun, q, boot, c) {
+    # 
+    #                                       fun(x = bootstrap[,ind],
+    #                                           quantiles = q, nrow = boot,
+    #                                           ncol = length(ind), ncores = c)
+    # 
+    #                                     }, a.combine = 'rbind',
+    #                                     ncores = 1,
+    #                                     fun = .summaryBigParCt, q = quantiles,
+    #                                     boot = n_boot, c = num_cores)
+    
+    summaryboot <- .summaryBigParCt(fbm = bootstrap, quantiles = quantiles, nrow = n_boot, ncol = n_obs_census, ncores = num_cores)
     ##################################################################################################
     
     colnames(summaryboot) <- c("mean", "var", "sd", paste(quantiles*100, "%-Quant", sep = ""))

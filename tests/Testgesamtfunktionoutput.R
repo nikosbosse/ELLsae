@@ -15,7 +15,7 @@ library(profvis)
 #ohne Parallelisierung, ohne FBM
 (prof <- profvis({
   #y <- ellsae(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 250L, seed = 5, num_cores = 7)
-  y <- ELLsae_big(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 1000, seed = 5, num_cores = 7, welfare.function = identity)
+  y <- ELLsae_big(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 2000, seed = 5, num_cores = 6)
 }))
 
 

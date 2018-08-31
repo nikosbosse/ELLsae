@@ -58,17 +58,17 @@ BEGIN_RCPP
 END_RCPP
 }
 // summaryBigParCt
-SEXP summaryBigParCt(Eigen::MatrixXd x, Eigen::VectorXd quantiles, int nrow, int ncol, int ncores);
-RcppExport SEXP _ELLsae_summaryBigParCt(SEXP xSEXP, SEXP quantilesSEXP, SEXP nrowSEXP, SEXP ncolSEXP, SEXP ncoresSEXP) {
+SEXP summaryBigParCt(Environment fbm, Eigen::VectorXd quantiles, int nrow, int ncol, int ncores);
+RcppExport SEXP _ELLsae_summaryBigParCt(SEXP fbmSEXP, SEXP quantilesSEXP, SEXP nrowSEXP, SEXP ncolSEXP, SEXP ncoresSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Environment >::type fbm(fbmSEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type quantiles(quantilesSEXP);
     Rcpp::traits::input_parameter< int >::type nrow(nrowSEXP);
     Rcpp::traits::input_parameter< int >::type ncol(ncolSEXP);
     Rcpp::traits::input_parameter< int >::type ncores(ncoresSEXP);
-    rcpp_result_gen = Rcpp::wrap(summaryBigParCt(x, quantiles, nrow, ncol, ncores));
+    rcpp_result_gen = Rcpp::wrap(summaryBigParCt(fbm, quantiles, nrow, ncol, ncores));
     return rcpp_result_gen;
 END_RCPP
 }

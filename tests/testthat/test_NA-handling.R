@@ -36,9 +36,7 @@ test_that("If there are NA in the location_survey
                       location_survey = "a", seed = 12345,
                       output = "all", n_boot = 50L))
   
-  # this is actually sth we need to check if we can geht to control
-  # it as I thing we have an error right now!!!
-  expect_warning(ellsae(model = y ~ a + b, clustermeans = "b",
+  expect_error(ellsae(model = y ~ a + b, clustermeans = "b",
                         surveydata = df.survey.NAexpl, censusdata = df.census,
                         location_survey = "a", seed = 12345,
                         output = "all", n_boot = 50L))

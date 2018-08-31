@@ -29,10 +29,10 @@ test_that("the function works", {
 test_that("different welfare functions can be introduced", {
   expect_equal(length(ellsae(model, surveydata , censusdata, location_survey,
                              n_boot = 5, seed = 1234, 
-                             welfare.function = function(x){2*x})),8)
+                             welfare.function = function(x){2*x})$yboot_est),8)
   expect_equal(length(ellsae(model, surveydata , censusdata, location_survey, 
                              n_boot = 5, 
-                             welfare.function = function(x){log(x^2 + 2)})),8)
+                             welfare.function = function(x){log(x^2 + 2)})$yboot_est),8)
 })
 
 
@@ -50,7 +50,7 @@ test_that("the function handles inputs for surveydata correctly", {
                8)
   expect_error(length(ellsae(model = model, censusdata = censusdata,
                              location_survey = location_survey, n_boot = 5)),
-               "Data frame with the surveydata is missing")
+               "Input surveydata is missing")
 })
 
 test_that("the function handles inputs for censusdata correctly", {
@@ -67,14 +67,16 @@ test_that("the function handles inputs for locations correctly", {
   # input: string = variable name
   expect_equal(length(ellsae(model, surveydata , censusdata, 
                              location_survey = "c",
-                             n_boot = 5)),8)
+                             n_boot = 5)$yboot_est),8)
   # input: location vector missing
   expect_error(length(ellsae(model, surveydata , censusdata, n_boot = 5)),
-               "you have to provide either 1) a vector of locations of length corresponding to the number of observations in the survey data or 2) a string with the name of a variable in the surveydata that provides the locations of individual observations")
+               "you have to provide a string with the variable indicating the
+         location in the survey data set")
   # input: string = not a variable name
   expect_error(length(ellsae(model, surveydata , censusdata, location_survey = "d",
                              n_boot = 5)),
-               "String that was specified as variable name for the location is not the name of one of the variables in the survey data set.")
+               "String that was specified as variable name for the location 
+         is not the name of one of the variables in the survey data set.")
 })
 
 
@@ -143,31 +145,26 @@ test_that("the manual prediction approach works
 predictionELLsae_bootstrap <- function(model, surveydata1 = surveydata, 
                                        censusdata1 = censusdata){
   model_fit <- lm(model, surveydata1)
-
-  p <- model_fit$rank
-  p1 <- seq_len(p)
-  piv <- if (p) {stats:::qr.lm(model_fit)$pivot[p1]}
-  beta <- model_fit$coefficients
-  Terms <- delete.response(terms(model_fit))
-  m <- model.frame(Terms, censusdata, na.action = na.pass,
-                   xlev = model_fit$xlevels)
-  X <- model.matrix(Terms, m, contrasts.arg = model_fit$contrasts)
+  
+  t <- terms.formula(model)
+  t <- delete.response(t)
+  X <- model.matrix(t, censusdata)
 
   beta_sample <- t(MASS::mvrnorm(n = 1000000,
                                  mu = coefficients(model_fit),
                                  Sigma = vcov(summary(model_fit))))
 
-  predictor <- drop(X[, piv, drop = FALSE] %*% beta_sample[piv,])
+  predictor <- X %*% beta_sample
   return(predictor)
 }
 
-
-test_that("manually taking a sample of x'beta, e.g. the mean of the 
-          randomly drawn y_pred converges to the true predicted values", {
-  expect_equal(round(rowmeanC(predictionELLsae_bootstrap(model5)),1)
-               ,round(predict.lm(m5, newdata = censusdata),1))
-})
-
+# 
+# test_that("manually taking a sample of x'beta, e.g. the mean of the 
+#           randomly drawn y_pred converges to the true predicted values", {
+#   expect_equal(round(rowmeanC(predictionELLsae_bootstrap(model5)),1)
+#                ,round(predict.lm(m5, newdata = censusdata),1))
+# })
+# 
 
 # test_that("ys converge to lm-ys", {
 #   expect_equal(round(rowMeans(ellsae(surveydata = )

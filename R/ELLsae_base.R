@@ -138,19 +138,23 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
   #     regression
   
   
-  ##### check whether model is specified correctly and if not try to correct 
-  if(missing(model)){stop("A model has to be specified")}
-  if(class(model) != "formula"){
+  ##### check whether model is specified correctly and if not try to correct
+  if (missing(model)) {
+    stop("A model has to be specified")
+  }
+  if (class(model) != "formula") {
     model <- try(as.formula(model), silent = T)
-    if (class(model) == "try-error"){
+    if (class(model) == "try-error") {
       stop("model must either be provided as a formula or as a string.
            See ?formula for help")
     }
-    }
+  }
+  response <- all.vars(model)[1]
+  explanatories <- all.vars(model)[-1]
   
   ##### check whether surveydata is specified correctly and trys to correct
   if(missing(surveydata)) stop("Input surveydata is missing")
-  if(!is.data.table(censusdata)){
+  if(!is.data.table(surveydata)){
     surveydata <- try(as.data.table(surveydata), silent = T)
     if (any(class(surveydata) == "try-error")){ #"any" prevents warning
       stop("survey data should be provided as data.table or something similar
@@ -158,8 +162,7 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
             your input into a data.table")
     }
   }
-  n_obs_survey <- nrow(surveydata)
-  if(!all( all.vars(model)[-1] %in%  names(surveydata))){
+  if(!all( explanatories %in%  names(surveydata))){
     stop("the model you provided specifies variables 
           that are not included in the surveydata")
   }
@@ -174,11 +177,11 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
            your input into a data.table")
     }
   }
-  if(!all( all.vars(model)[-1] %in%  names(censusdata))){
+  if(!all( explanatories %in%  names(censusdata))){
     stop("the model you provided specifies variables 
           that are not included in the censusdata")
   }
-  n_obs_census <- nrow(censusdata)
+
   
   
   ##### check whether the locations are specified correctly and try to correct
@@ -197,13 +200,7 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
          is not the name of one of the variables in the survey data set.")
   }
   
-  if(any(is.na(surveydata[, ..location_survey]))){ 
-    warning("There are missing values in the locations of your surveydata set. 
-            Rows with missing values were omitted") 
-    na.omit(surveydata, cols = c(location_survey))
-  } 
-  
-  
+
   ##### check whether n_boot was specified
   if(missing(n_boot)){
     message(cat("As n_boot was not provided it was per default set to ", 
@@ -253,8 +250,8 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
         )
       }
     }
-    y <- all.vars(model)[1]
-    suveydata[, c(y) := transfy(..y)]
+    
+    suveydata[, c(y) := transfy(..response)]
   }
   
   #### check whether output was correctly specified
@@ -293,6 +290,22 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
   quantiles <- sort(quantiles) # sort anyway to be sure for C++
 
   
+  
+  # check for NA
+  if (any(is.na(surveydata[,c(..response, 
+                              ..explanatories, 
+                              ..location_survey)]))){
+    na.omit(surveydata, cols = c(..response, 
+                                 ..explanatories, 
+                                 ..location_survey))
+    warning("your surveydata had missing values. Affected rows were removed.")
+  }
+  if (any(is.na(censusdata[,c(..explanatories)]))){
+    na.omit(censusdata, cols = c(..explanatories))
+    warning("your surveydata had missing values. Affected rows were removed.")
+  }
+  n_obs_survey <- nrow(surveydata)
+  n_obs_census <- nrow(censusdata)  
   
   
   ######## clustermeans #######
@@ -351,7 +364,7 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
     }
     if(!all( clustermeans %in%  names(surveydata))){
       warning("your input for clustermeans includes variables that are not 
-              present in the surveydata set.Means for variables will be added 
+              present in the surveydata set. Means for variables will be added 
               to the model for variables not originally present in the survey")
     }
     
@@ -425,20 +438,12 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
   t <- terms.formula(model)
   t <- delete.response(t)
   X_census <- model.matrix(t, censusdata)
-  if(any(is.na(X_census))){
-    warning("some explanatory variables in the census data set were missing. 
-            Affected rows were removed")
-    X_census <- na.omit(X_census)
-    attributes(X_census)[-1] <- NULL
-  }
-  
   
   betas <- t(MASS::mvrnorm(n = n_boot,
                            mu = coefficients(model_fit),
                            Sigma = vcov(summary(model_fit))))
 
   # in Dokumentation schreiben: num_cores <- parallel::detectCores() - 1
-  
   
   
   bootstrap <- .InfCensCpp(n_bootstrap = n_boot, 

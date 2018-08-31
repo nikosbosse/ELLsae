@@ -23,7 +23,8 @@ test_that("computing and attaching the means actually works", {
 })
 
 test_that("All the error messages are pasted correctly at the right time", {
-  expect_error(ellsae(model = y ~ a + b, clustermeans = "d",
+  #we compute means for a variable that isn't even part of the model
+  expect_warning(ellsae(model = y ~ a + b, clustermeans = "d",
                       surveydata = df.survey, censusdata = df.census,
                       location_survey = "a",
                       output = "all", n_boot = 50L))

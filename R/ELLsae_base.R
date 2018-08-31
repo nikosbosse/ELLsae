@@ -156,7 +156,7 @@ ellsae <- function(model,
       stop("model must either be provided as a formula or as a string.
            See ?formula for help")
     }
-    }
+  }
   response <- all.vars(model)[1]
   explanatories <- all.vars(model)[-1]
   
@@ -173,7 +173,7 @@ ellsae <- function(model,
         your input into a data.table"
       )
     }
-    }
+  }
   if (!all(explanatories %in%  names(surveydata))) {
     stop("the model you provided specifies variables
          that are not included in the surveydata")
@@ -191,7 +191,7 @@ ellsae <- function(model,
         your input into a data.table"
       )
     }
-    }
+  }
   if (!all(explanatories %in%  names(censusdata))) {
     stop("the model you provided specifies variables
          that are not included in the censusdata")
@@ -276,10 +276,9 @@ ellsae <- function(model,
           backtransformation of the bootstrap sample"
         )
       }
-      }
-    
+    }
     suveydata[, c(y) := transfy(..response)]
-      }
+  }
   
   #### check whether output was correctly specified
   if (!is.character(output)) {
@@ -356,7 +355,7 @@ ellsae <- function(model,
           for location_survey suffices."
         )
       }
-      }
+    }
     
     # checks if all the locations in the survey are equal those in the census.
     if (!all(unique(surveydata[, ..location_survey]) %in%
@@ -400,7 +399,7 @@ ellsae <- function(model,
         b) a character vector with your variables
         c) a \"\'.\'\" as string, indicating that you want to include the
         mean of all the variables in your model"
-        )
+      )
     }
     if (!all(clustermeans %in%  names(censusdata))) {
       stop(
@@ -446,7 +445,7 @@ ellsae <- function(model,
                                    sep = " + ")
     model <- as.formula(paste(model_left_hand_side,
                               model_right_hand_side, sep = " ~ "))
-    }
+  }
   
   
   # -------------------------- inference survey ------------------------------ #
@@ -567,4 +566,4 @@ ellsae <- function(model,
   }
   
   return(output_list)
-    }
+}

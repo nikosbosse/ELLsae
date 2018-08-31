@@ -2,6 +2,7 @@
 
 export(ELLsae_big)
 export(ellsae)
+export(ellsae_big)
 import(data.table)
 import(stats)
 importFrom(MASS,mvrnorm)

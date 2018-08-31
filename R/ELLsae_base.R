@@ -75,7 +75,7 @@
 #' "Bootraps-of-Y.csv". 
 #' @seealso Other small area estimation methods can also be found 
 #' in the package \code{sae}. 
-#' @keywords SAE, imputation, ELLsea_base 
+#' @keywords SAE, imputation 
 #' @references 
 #'   Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003). 
 #'   \emph{Micro-Level Estimation of Poverty and Inequality}. 
@@ -206,7 +206,8 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
   
   ##### check whether n_boot was specified
   if(missing(n_boot)){
-    message(cat("As n_boot was not provided it was per default set to ", n_boot, sep = ""))
+    message(cat("As n_boot was not provided it was per default set to ", 
+                n_boot, sep = ""))
   } 
   if(length(n_boot) != 1){
     stop("n_boot has to be provided as single integer")
@@ -216,6 +217,16 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
     if(class(n_boot) == "try-error"){
       stop("n_boot has to be provided as single integer")
     } 
+  }
+  
+  # as the function sets a seed, save the internal seed and restore it later
+  if(!missing(seed)){
+    runif(1) # make sure R sets seed internally
+    previousseed <- .Random.seed
+    on.exit( { .Random.seed <<- previousseed } )
+    set.seed(seed)
+  } else {
+    seed <- as.numeric(Sys.time()) # seed needd for C++
   }
   
   ##### check whether seed was specified
@@ -228,18 +239,8 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
       stop("If you want to set a seed it has to be provided as single integer")
     } 
   }
-  # as the function sets a seed, save the internal seed and restore it later
-  if(!missing(seed)){
-    runif(1) # make sure R sets seed internally
-    previousseed <- .Random.seed
-    on.exit( { .Random.seed <<- previousseed } )
-    set.seed(seed)
-  } else {
-    seed <- as.numeric(Sys.time()) # seed needd for C++
-  }
   
-  
-  welfare.function
+ 
   if (!missing(transfy)) {
     if (missing(transfy_inv)) {
       if (transfy == log) {
@@ -282,7 +283,7 @@ ellsae <- function(model, surveydata, censusdata, location_survey,
     stop("quantiles must be provided as an ascending vector of numbers 
          between 0 and 1")
   }
-  if (any(quantiles) < 0 | any(quantiles) > 1){
+  if (any(quantiles < 0) | any(quantiles > 1)){
     quantiles <- quantiles[-which(quantiles < 0 | quantiles > 1)]
     warning("quantiles < 0 and >1 are automatically omitted")
   }

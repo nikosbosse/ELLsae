@@ -1,5 +1,6 @@
 #' @title ellsae_big
-#' @description \code{ellsae} is a method for small area estimation used to impute a missing 
+#' @description \code{ellsae_big} is a method for small area estimation used to 
+#' impute a missing 
 #' variable from a smaller survey dataset into a census. The imputation is based 
 #' on a linear model and bootstrap samples. 
 #' 
@@ -13,24 +14,39 @@
 #' @param location_survey Name of location variable or vector for the survey 
 #'   data which is used for error correction and the location means (if 
 #'   \code{clustermeans} is specified) 
-#' @param clustermeans Additional parameters for the regression based on location 
-#'   means calculated from the census data to account for the lack of 
-#'   information in a small survey 
-#' @param location_census name of location variable (string) in the census data 
-#'   which is used for error correction and location means. 
-#'   If \code{clustermeans} 
-#'   is specified, but \code{location_census} is missing 
 #' @param n_boot Number of bootstrap samples used for the estimation, default is 
 #'   \code{n_boot = 50} 
+#' @param seed to make research reproducible a seed can be set. Simple 
+#' \code{set.seed()} in R wont work as functions run in \code{C++}.
+#' Seed is again randomized after running the function.
 #' @param welfare.function Additionally a welfare function for the response can 
 #'   be specified 
-#' @param parallel indicates if compution is supposed to be done in parallel to 
-#'   improve speed 
-#' @param output indicator for which output is requested as a list.
-#' @param save_yboot logical indicator if the bootraps of the response y are 
+#' @param transfy function to transform the response y in the model
+#' @param transfy_inv function for backtransformation of \code{transf}
+#' @param output as "default" a list with ... is returned. Write "all" for all
+#' possible outputs or specify outputs yourself in a vector.
+#' @param num_cores utilizes the given number of cores to speed up the 
+#' estimation. The number of cores can be determined by 
+#' parallel::detectCores() - 1 or bigstatsr::nb_cores() that returnes only
+#' physical cores. 
+#' @param quantiles vector of requested quantiles for the \code{summaryboot}
+#' output as decimals between 0 and 1.
+#' @param clustermeans Additional parameters for the regression based on 
+#' location means calculated from the census data to account for the lack of 
+#' information in a small survey 
+#' @param location_census name of location variable (string) in the census data 
+#'   which is used for error correction and location means. 
+#'   If \code{clustermeans} has an a variable and
+#'   \code{location_census} is missing, name of the \code{location_survey}
+#'   variable is tried.
+#' @param save_boot logical indicator if the bootstraps of the response y are 
 #' supposed to be saved as a CSV file under your current working direktory. 
-#' The name is: ...
-#' @return The function takes the the typically smaller surveydata and uses the 
+#' The name is: BootstrapSampleELLsae-DATE.csv
+#' @return Use this function over \code{ellsae} if that one fails because the
+#' census matrix is really large and you are trying to draw many bootstrap
+#' samples. Generally \code{ellsae} is faster and more efficient.
+#' 
+#' The function takes the the typically smaller surveydata and uses the 
 #' argument \code{model} to estimate a linear model of the type \code{lm()}. In case
 #' the argument \code{clustermeans} is specified means from the cluster data for the given 
 #' variables are calculated and merged with the survey databy cluster locations. These
@@ -64,11 +80,10 @@
 #' 
 #'   Guadarrama Sanz, M., Molina, I., and Rao, J.N.K.  (2016). \emph{A comparison of small 
 #'   area estimation methods for poverty mapping}. In: 17 (Mar. 2016), 41-66 and 156 and 158.
-#' @examples mean(c(1,2,3,4))
 #' @export  
 
 
-ellsae <- function(model, surveydata, censusdata, location_survey,
+ellsae_big <- function(model, surveydata, censusdata, location_survey,
                    n_boot = 50, seed, welfare.function, transfy, transfy_inv, 
                    output = "default", num_cores = 1, 
                    quantiles = c(0, 0.25, 0.5, 0.75, 1), clustermeans, 

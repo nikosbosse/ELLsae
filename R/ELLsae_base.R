@@ -156,6 +156,7 @@ ellsae <- function(model,
            See ?formula for help")
     }
   }
+  # saving the model parameters to avoid recalculation later on
   response <- all.vars(model)[1]
   explanatories <- all.vars(model)[-1]
   
@@ -173,6 +174,7 @@ ellsae <- function(model,
       )
     }
   }
+  # all the variables of the model have to be in the data as well
   if (!all(explanatories %in%  names(surveydata))) {
     stop("the model you provided specifies variables
          that are not included in the surveydata")
@@ -191,12 +193,11 @@ ellsae <- function(model,
       )
     }
   }
+  # names of the explanatories need to match those in the census
   if (!all(explanatories %in%  names(censusdata))) {
     stop("the model you provided specifies variables
          that are not included in the censusdata")
   }
-  
-  
   
   ##### check whether the locations are specified correctly and try to correct
   if (missing(location_survey)) {
@@ -205,7 +206,7 @@ ellsae <- function(model,
       location in the survey data set"
     )
   }
-  
+  # check whether locaion_survey is specified correctly
   if (!(length(location_survey) == 1 &
         is.character(location_survey))) {
     stop(
@@ -213,14 +214,13 @@ ellsae <- function(model,
       location in the survey data set"
     )
   }
-  
+  # localtion_survey has to be avariable of the survey
   if (!location_survey %in% names(surveydata)) {
     stop(
       "String that was specified as variable name for the location
       is not the name of one of the variables in the survey data set."
     )
   }
-  
   
   ##### check whether n_boot was specified
   if (missing(n_boot)) {
@@ -263,7 +263,9 @@ ellsae <- function(model,
     }
   }
   
-  
+  # checks whether the user wants a transformation of the response
+  # and if only transfy is given but is "log" automatically sets transfy_inv
+  # to be exponential otherwise error
   if (!missing(transfy)) {
     if (missing(transfy_inv)) {
       if (transfy == log) {
@@ -283,7 +285,7 @@ ellsae <- function(model,
   if (!is.character(output)) {
     stop(
       "your input for character should eiher be 'all', 'default', or a
-      vector with the outputs you want, e.g. c('summary', 'yboot')"
+      vector with the outputs you want, e.g. c('summary_boot','yboot_est', ...)"
     )
   }
   
@@ -298,6 +300,7 @@ ellsae <- function(model,
     }
   }
   
+  # Trys to correct the quantiles if specified incorrectly
   quantiles <-
     try(as.numeric(quantiles))
   #must be done to pass to C++
@@ -314,26 +317,29 @@ ellsae <- function(model,
     warning("quantiles < 0 and >1 are automatically omitted")
   }
   if (length(quantiles) == 0) {
-    quantiles <- c(0.5) # can't pass vector of length 0 to C++
+    quantiles <- c(0.5) 
+    # can't pass vector of length 0 to C++
   }
-  quantiles <- sort(quantiles) # sort anyway to be sure for C++
+  quantiles <- sort(quantiles) 
+  # sort anyway to be sure for C++
   
   
   
-  # check for NA
-  if (any(is.na(surveydata[, c(..response,
-                               ..explanatories,
-                               ..location_survey)]))) {
-    na.omit(surveydata,
-            cols = c(..response,
-                     ..explanatories,
-                     ..location_survey))
+  # check for NA and remove 
+  # unique needed as location_survey might also be in the model
+  all.variables <- unique(c(response,
+                            explanatories,
+                            location_survey))
+  if (any(is.na(surveydata[, ..all.variables]))) {
+    # removes incomplete rows
+    surveydata <- surveydata[complete.cases(surveydata[, ..all.variables])]
     warning("your surveydata had missing values. Affected rows were removed.")
   }
   if (any(is.na(censusdata[, c(..explanatories)]))) {
     na.omit(censusdata, cols = c(..explanatories))
     warning("your surveydata had missing values. Affected rows were removed.")
   }
+  # only after NAs where deleted, otherwise too long !
   n_obs_survey <- nrow(surveydata)
   n_obs_census <- nrow(censusdata)
   

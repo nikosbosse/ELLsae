@@ -79,20 +79,18 @@ welfare function after which either the mean of the yhat or of the welfare
 fuctiom is returned.
 
 The function returns a list with different objects. If \code{output}
-is left unspecified the estimated Y´s or welfare estimates \code{yhat},
+is left unspecified the estimated Y´s or welfare estimates \code{yboot_est},
 the fit of the linear model \code{model_fit} and a summary of the bootstrap
-samples
-\code{bootstrapCI} are returned.
+samples\code{summary_boot} are returned.
 
-If \code{output} is specified all the arguments given are returned.
-Next to the
-above the following inputs are possible, \code{surveydata} and
-\code{censusdata}
-return the data frames used for the compution as some rows might be
-deleted due
-to NA handling and additional variables are created for \code{clustermeans}.
+If the \code{output} is user specified all the arguments given are returned.
+Next to the above, updated \code{survey} and
+\code{census} data can be returned, as well as a matrix of the 
+\code{boostrap} response variable. The last one can also be saved as a file
+by the use of \code{save_boot = T}. It will then be written in the file 
+"BootstrapSampleELLsae-<Date>.csv". 
 
-Additionally the bootstrapped Y´s can be saved as a CSV if
+Rows with NA's are omitted from the computation.
 \code{save_yboot} is
 set equal \code{TRUE} and can be found under the current working directory as
 "Bootraps-of-Y.csv".
@@ -105,7 +103,8 @@ The imputation is based on a linear model and bootstrap samples.
 \examples{
 # How to split the data for an example
 
-brazil <- data(brazil)
+data(brazil)
+brazil <-  brazil
 
 # generate indexes for the rows to keep. order indexes to keep.
 helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = F)

@@ -1,6 +1,8 @@
 #' ELLsae: A package for small area estimation
 #' @section ELLsae functions:
-#' Delivered are two functions that do about the same thing ...
+#' Contains two functions one for normal use cases called \code{ellsae} and a 
+#' second one called \code{ellsae_big} that can be used if RAM consumption 
+#' becomes an issue but which is slower that the basic version.
 #' @description A method for small area estimation.
 #' @details  The method for small area estimation added by this package is 
 #' largely based on an approach developed 
@@ -12,16 +14,14 @@
 #' is left omitted. +
 #' @author Nikos Bosse [aut, cre], Felix Suettmann [aut, cre]
 #' @docType package
-#' @name ELLsae
+#' @name ELLsae-package
 #' @references Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003). 
 #' \emph{Micro-Level Estimation of Poverty and Inequality}. 
 #'   In: Econometrica 71.1, pp. 355-364, Jan 2003
 #' @seealso Other small area estimation methods can also be found in the 
 #' package \code{sae}.
+#' @keywords internals
 #' @import data.table
 #' @import stats
 #' @importFrom MASS mvrnorm
-
-# importFrom stats as.formula coefficients delete.response lm model.matrix 
-# na.omit predict rbinom residuals rnorm rpois terms.formula vcov
-NULL
+"_PACKAGE"

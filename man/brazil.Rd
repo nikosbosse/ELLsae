@@ -35,7 +35,8 @@ The dataset contains 350,696 individual observations from the 2010 census in
 \examples{
 # How to split the data for an example
 
-brazil <- data(brazil)
+data(brazil)
+brazil <- brazil
 
 # generate indexes for the rows to keep. order indexes to keep. 
 helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = F)

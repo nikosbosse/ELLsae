@@ -517,7 +517,7 @@ ellsae <- function(model,
     ncores = num_cores
   )
   
-  
+  # back transfromation if previeously transformed responses
   if (!missing(transfy)) {
     bootstrap <- transfy_inv(bootstrap)
   }
@@ -528,7 +528,7 @@ ellsae <- function(model,
   }
   
   
-  
+  # generation of the possible output
   output_list <- list()
   if (output == "default" | output == "all" | "yboot" %in% output) {
     output_list$yboot_est <- rowMeans(bootstrap)

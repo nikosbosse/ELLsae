@@ -240,7 +240,7 @@ ellsae <- function(model,
     }
   }
   
-  # as the function sets a seed, save the internal seed and restore it later
+  # if a seed is specified, save the internal seed and restore it later
   if (!missing(seed)) {
     runif(1) # make sure R sets seed internally
     previousseed <- .Random.seed
@@ -252,7 +252,7 @@ ellsae <- function(model,
     seed <- as.numeric(Sys.time()) # seed needd for C++
   }
   
-  ##### check whether seed was specified
+  ##### check whether seed is now correctly specified
   if (length(seed) != 1) {
     stop("If you want to set a seed it has to be provided as single integer")
   }
@@ -264,19 +264,11 @@ ellsae <- function(model,
   }
   
   # checks whether the user wants a transformation of the response
-  # and if only transfy is given but is "log" automatically sets transfy_inv
-  # to be exponential otherwise error
   if (!missing(transfy)) {
     if (missing(transfy_inv)) {
-      if (transfy == log) {
-        transfy_inv <- exp
-      } else {
-        stop(
-          "if you want to transform the response variable with a function
-          different from 'log', you have to provide an inverse function for
-          backtransformation of the bootstrap sample"
-        )
-      }
+      message("you have transformed y, but not provided a funtion transfy_inv
+              for backtransformation")
+      } 
     }
     suveydata[, c(y) := transfy(..response)]
   }
@@ -530,9 +522,6 @@ ellsae <- function(model,
   
   # generation of the possible output
   output_list <- list()
-  if (output == "default" | output == "all" | "yboot" %in% output) {
-    output_list$yboot_est <- rowMeans(bootstrap)
-  }
   if (output == "default" |
       output == "all" | "summary" %in% output |
       "summary_boot" %in% output) {
@@ -548,6 +537,14 @@ ellsae <- function(model,
                                "sd",
                                paste(quantiles * 100, "%-Quant", sep = ""))
     output_list$summary_boot <- summaryboot
+  }
+  if (output == "default" | output == "all" | "yboot" %in% output) {
+    if(output == "default" | output == "all" | 
+       "summary" %in% output | "summary_boot" %in% output){
+      output_list$yboot_est <- summaryboot[,1]
+    } else {
+      output_list$yboot_est <- rowMeans(bootstrap)
+    }
   }
   if (output == "default" |
       output == "all" | "model_fit" %in% output) {

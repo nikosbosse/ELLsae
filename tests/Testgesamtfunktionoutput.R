@@ -1,24 +1,123 @@
-# library(data.table)
-# data <- SAE::househoulddatabrazil
-# helper <- sample(x = 1:nrow(data), size = nrow(data)/5, replace = F)
-# helper <- sort(helper)
-# surv <- data[helper,]
-# cens <- data[-helper,]
-# rm(list = "helper") #delete helper
+library(data.table)
+data <- ELLsae::brazil
+
+helper <- sample(x = 1:nrow(data), size = nrow(data)/5, replace = F)
+helper <- sort(helper)
+surv <- data[helper,]
+cens <- data[-helper,]
+rm(list = "helper") #delete helper
+
+
+mod <-  hh_inc ~ age + urban + sex + religion + adults + children
+loc <- "geo2_br"
+
+names(ELLsae::brazil)
+
+library(profvis)
+
+#ohne Parallelisierung, ohne FBM
+(prof <- profvis({
+  y <- ellsae(output = "all", model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 250L, seed = 5, num_cores = 7)
+  
+}))
+
+
+
+# (const int n_bootstrap,
+#   const int n_obs_censusdata, 
+#   const Eigen::Map<Eigen::VectorXd> locationeffects, 
+#   const Eigen::Map<Eigen::VectorXd> residuals,
+#   const Eigen::Map<Eigen::MatrixXd> X, 
+#   const Eigen::Map<Eigen::MatrixXd> beta_sample, 
+#   int userseed, int ncores) 
 # 
-# mod <-  hh_inc ~ age + urban + rooms + sex + religion + race + adults + children
-# loc <- "geo2_br"
-# 
-# 
-# library(profvis)
-# 
-# #ohne Parallelisierung, ohne FBM
-# (prof <- profvis({
-#   #y <- ellsae(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 250L, seed = 5, num_cores = 7)
-#   y <- ELLsae_big(model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), 
-#                   censusdata = cens, location_survey = loc, 
-#                   n_boot = 300, seed = 5, num_cores = 6, welfare.function = exp)
-# }))
+
+
+x <- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# profiling for speed of application
+m <- y$bootsample
+
+m4 <- as.data.frame(m2)
+
+rm(m2)
+
+m <- y$bootsample
+n <- names(m3)
+
+  system.time(m2 <- sqrt(m))
+  system.time(
+    m3[, ..n := lapply(m3[, ..n], FUN = sqrt)]
+  )
+  
+  m3[, "..n" := NULL]
+  names(m3)
+  
+ 
+  system.time(m4 <- apply(m, MARGIN = 2, sqrt))
+  system.time(m5 <- vapply(m, sqrt, numeric(1)))
+  
+?Sys.time()
+  
+  
+  Sys.time()
+
+m5 <- as.data.table(m)[, ..names(m) := sqrt(..names(m))]
+
+dim(m5)
+
+colnames(m5)
+
+names(m5)
+
+list(m)
+
+
+y <- function(x){
+  if(x> 0){
+    return(1)
+  } else {
+    return(-1)
+  }
+}
+
+m5[, ..n := lapply(m5[, ..n], FUN = sqrt)]
+
+system.time({
+  DT1[, cnames[-1] := lapply(DT1[,cnames[-1],with=FALSE],
+                             function(x) gsub(" ", "_", x))]
+})
+
+a <- list(m)
+
+
+
+
+
+
+
+
+
+m2 <- m[1:100, 1:100]
+
+m3[] <- vapply(m2, sqrt, numeric(1))
+
+m2[1,6]
 # 
 # 
 # all(round(y$summary_boot[1:5,1:8], 6) == round(y2$summary_boot[1:5,1:8], 6))

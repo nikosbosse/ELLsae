@@ -69,14 +69,15 @@ test_that("the function handles inputs for locations correctly", {
                              location_survey = "c",
                              n_boot = 5)$yboot_est),8)
   # input: location vector missing
-  expect_error(length(ellsae(model, surveydata , censusdata, n_boot = 5)),
-               "you have to provide a string with the variable indicating the
-         location in the survey data set")
+  expect_error(length(ellsae(model, surveydata , censusdata, n_boot = 5)))
+  #"you have to provide a string with the variable indicating       
+  # location in the survey data set"
   # input: string = not a variable name
-  expect_error(length(ellsae(model, surveydata , censusdata, location_survey = "d",
-                             n_boot = 5)),
-               "String that was specified as variable name for the location 
-         is not the name of one of the variables in the survey data set.")
+  expect_error(length(ellsae(model, surveydata , censusdata, 
+                             location_survey = "d",
+                             n_boot = 5)))
+  #"String that was specified as variable name for the location 
+  # is not the name of one of the variables in the survey data set."
 })
 
 

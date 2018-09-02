@@ -27,7 +27,9 @@
 #'  or a vector with one or more of the following elements: c("summary",
 #'  "yboot", "model_fit", "bootsample", "survey", "census")
 #'@param cores_c either a string, "auto", or an integer value indicating the
-#'  number of cores to be used for the estimation.
+#'  number of cores to be used for the estimation in C++.
+#'@param cores_r either a string, "auto", or an integer value indicating the
+#'  number of cores to be used for the estimation in R. 
 #'@param quantiles vector of requested quantiles for the \code{summaryboot}
 #'  output as decimals between 0 and 1.
 #'@param clustermeans character vector with names of variables present in both
@@ -80,6 +82,12 @@
 #'parallelization is done in C++ and incurs little overhead this should in most
 #'cases be left to "auto".
 #'
+#'\code{cores_r} specifies the number of cores to used for calculations in R.
+#'The method of parallelization is the one implemented in the pacakge
+#'\code{\link{[foreach]}}. Parallelization does come with a signifacnt overhead,
+#'the default is therefore 1. "auto" invokes \code{\link{[bigstatsr]nb_cores()}}
+#'and creates clusters according to the number of physical CPUs available.
+#'
 #'To obtain reproducicble results, seed must be specified. Simply running
 #'\code{set.seed()} in R does not work. Providing a seed will not permanently
 #'alter the seed in R.
@@ -122,6 +130,7 @@
 #'                transfy_inv = exp,
 #'                output = "all",
 #'                cores_c = "auto",
+#'                cores_r = 1,
 #'                quantiles = c(0, 0.25, 0.5, 0.75, 1),
 #'                clustermeans = "age",
 #'                location_census = "geo2_br",
@@ -320,17 +329,29 @@ ellsae_big <- function(model,
     )
   }
   
-  ##### check whether cores was correctly specified
-  if (length(cores) != 1) {
+  ##### check whether cores are correctly specified
+  if (length(cores_c) != 1) {
     stop("cores has to be either 'auto' or a single integer")
   }
-  if (cores == "auto"){
-    cores <- 999L
+  if (cores_c == "auto"){
+    cores_c <- 999L
   }
-  if (!is.integer(cores)) {
-    cores <- try(as.integer(cores), silent = T) 
-    if (!is.integer(cores)) {
-      stop("cores has to be either 'auto' or a single integer")
+  if (!is.integer(cores_c)) {
+    cores <- try(as.integer(cores_c), silent = T) 
+    if (!is.integer(cores_c)) {
+      stop("cores_c has to be either 'auto' or a single integer")
+    }
+  }
+  if (length(cores_r) != 1) {
+    stop("cores has to be either 'auto' or a single integer")
+  }
+  if (cores_r == "auto"){
+    cores_r <- bigstatsr::nb_cores()
+  }
+  if (!is.integer(cores_r)) {
+    cores_r <- try(as.integer(cores_c), silent = T) 
+    if (!is.integer(cores_r)) {
+      stop("cores_r has to be either 'auto' or a single integer")
     }
   }
   
@@ -552,15 +573,24 @@ ellsae_big <- function(model,
   # generation of the possible output
   output_list <- list()
   
+  
+  # pass-by-reference behaviour of .summaryBigParCt alters order of bootstrap
+  # we want to return it unordered and therefore have to make a copy. 
+  if (any(output == "all" | output == "bootsample")) {
+    bootstrapcopy <- bigstatsr::big_copy(bootstrap)
+  }
+  
   if (any(output == "default" |
           output == "all" | 
           output == "summary"  |
           output == "summary_boot"))  {
+    
     summaryboot <- .summaryBigParCt(fbm = bootstrap, 
                                     quantiles = quantiles, 
                                     nrow = n_boot, 
                                     ncol = n_obs_census, 
                                     ncores = cores_c)
+    # bootstrap is now altered by .summaryBigParCt
     colnames(summaryboot) <- c("mean",
                                "var",
                                "sd",
@@ -593,7 +623,7 @@ ellsae_big <- function(model,
   }
   
   if (any(output == "all" | output == "bootsample")) {
-    output_list$bootsample <- bootstrap
+    output_list$bootsample <- bootstrapcopy
   }
   
   if (any(output == "all" | output == "survey")) {

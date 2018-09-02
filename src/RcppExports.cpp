@@ -25,12 +25,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // summaryParC
-SEXP summaryParC(Eigen::MatrixXd x, Eigen::VectorXd quantiles, int nrow, int ncol, int ncores);
+SEXP summaryParC(Eigen::Map<Eigen::MatrixXd> x, Eigen::VectorXd quantiles, int nrow, int ncol, int ncores);
 RcppExport SEXP _ELLsae_summaryParC(SEXP xSEXP, SEXP quantilesSEXP, SEXP nrowSEXP, SEXP ncolSEXP, SEXP ncoresSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type x(xSEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type quantiles(quantilesSEXP);
     Rcpp::traits::input_parameter< int >::type nrow(nrowSEXP);
     Rcpp::traits::input_parameter< int >::type ncol(ncolSEXP);

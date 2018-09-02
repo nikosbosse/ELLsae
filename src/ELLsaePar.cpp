@@ -34,7 +34,7 @@ SEXP InfCensCpp(const int n_bootstrap,
   std::uniform_int_distribution<> distrres(0, upperresiduals - 1);
   
   // initialize and fill matrix for randam locations and residuals 
-  Eigen::MatrixXd LocationEffectResiduals(n_obs_censusdata, n_bootstrap);
+  Eigen::MatrixXd result(n_obs_censusdata, n_bootstrap);
   
 #ifdef _OPENMP
   if (ncores == 999){
@@ -52,26 +52,19 @@ SEXP InfCensCpp(const int n_bootstrap,
 #endif
   
   
-#pragma omp for
+#pragma omp for schedule(dynamic)
   for (int i=0; i<n_obs_censusdata; ++i)
     for (int j=0; j<n_bootstrap; j++)
-      LocationEffectResiduals(i,j) = locationeffects[distrloc(lgen)] + residuals[distrres(lgen)];
+      result(i,j) = X.row(i)* beta_sample.col(j) + locationeffects[distrloc(lgen)] + residuals[distrres(lgen)];
 } 
 
-
-// ----- create Xbeta ------- //
-Eigen::MatrixXd Xbeta = X * beta_sample;
-
-// ----- combine results ------- //
-Eigen::MatrixXd returnmatrix = Xbeta + LocationEffectResiduals;
-
-return Rcpp::wrap(returnmatrix);
+return Rcpp::wrap(result);
 
 }
 
 
 // [[Rcpp::export(.summaryParC)]]
-SEXP summaryParC(Eigen::MatrixXd x,
+SEXP summaryParC(Eigen::Map<Eigen::MatrixXd> x,
                  Eigen::VectorXd quantiles, 
                  int nrow, int ncol, int ncores) {
   
@@ -166,7 +159,7 @@ void InfCensBigCpp(Environment fbm, const int n_bootstrap,
   dqrng::xoshiro256plus lgen(gen);      // make thread local copy of rng
   lgen.jump(omp_get_thread_num() + 1);  // advance rng by 1 ... ncores jumps
   
-#pragma omp for
+#pragma omp for schedule(dynamic)
   for (int i=0; i<n_obs_censusdata; ++i)
     for (int j=0; j<n_bootstrap; j++)
       macc(j,i) = X.row(i) * beta_sample.col(j) + locationeffects[distrloc(lgen)] + residuals[distrres(lgen)];

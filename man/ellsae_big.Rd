@@ -143,7 +143,7 @@ permanently alter the seed in R.
 \examples{
 # Generate a sample survey and census data from the provided brazil data set
 brazil <-  ELLsae::brazil
-helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = F)
+helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = FALSE)
 helper <- sort(helper)
 survey <- brazil[helper,]
 census <- brazil[-helper,]
@@ -163,7 +163,7 @@ ELLsae::ellsae_big(model = model.example,
                    quantiles = c(0, 0.25, 0.5, 0.75, 1),
                    clustermeans = "age",
                    location_census = "geo2_br",
-                   save_boot = F)
+                   save_boot = FALSE)
 }
 \references{
 Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003).

@@ -126,7 +126,7 @@ permanently alter the seed in R.
 \examples{
 # Generate a sample survey and census data from the provided brazil data set
 brazil <-  ELLsae::brazil
-helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = F)
+helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = FALSE)
 helper <- sort(helper)
 survey <- brazil[helper,]
 census <- brazil[-helper,]

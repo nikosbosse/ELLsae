@@ -10,9 +10,9 @@
 #'@param model a model that describes the relationship betwenn the response and
 #'  the explanatory variables. Input must be a linear model that can be
 #'  processed by \code{lm()}
-#'@param surveydata data set with the response variable of interest included.
+#'@param survey data set with the response variable of interest included.
 #'  Will be used to estimate the linear model
-#'@param censusdata dataset where the variable of interest is missing and shall
+#'@param census dataset where the variable of interest is missing and shall
 #'  be imputed
 #'@param location_survey string with the name of the variable in the survey data
 #'  set that contains information about the cluster (= location) of an

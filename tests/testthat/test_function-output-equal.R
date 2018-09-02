@@ -13,12 +13,12 @@ location_survey = "a"
 
 test_that("outputs of ellsea and ellsea_big equal?", {
   expect_equal(trunc(ellsae(model = y ~ a + b, clustermeans = "b",
-                      surveydata = df.survey, censusdata = df.census,
+                      survey = df.survey, census = df.census,
                       location_survey = "a", seed = 12345,
                       output = "all", n_boot = 50L)$summary_boot[,1]),
                trunc(ellsae_big(model = y ~ a + b, clustermeans = "b",
-                                surveydata = df.survey, 
-                                censusdata = df.census,
+                                survey = df.survey, 
+                                census = df.census,
                                 location_survey = "a", seed = 12345,
                                 output = "all", n_boot = 50L)$summary_boot[,1]))
 })

@@ -4,29 +4,25 @@
 \alias{ellsae_big}
 \title{ellsae_big}
 \usage{
-ellsae_big(model, surveydata, censusdata, location_survey, location_census,
-  mResponse, n_boot = 50, seed, welfare.function, transf, transf_inv,
-  output = "default", num_cores = 1, quantiles = c(0, 0.25, 0.5,
-  0.75, 1), save_boot = F)
+ellsae_big(model, survey, census, location_survey, n_boot = 250L, seed,
+  welfare.function, transfy, transfy_inv, output = "default",
+  cores_c = "auto", cores_r = 1, quantiles = c(0, 0.25, 0.5, 0.75,
+  1), clustermeans, location_census, save_boot = F)
 }
 \arguments{
 \item{model}{a model that describes the relationship betwenn the response and
 the explanatory variables. Input must be a linear model that can be
 processed by \code{lm()}}
 
-\item{surveydata}{data set with the response variable of interest included.
+\item{survey}{data set with the response variable of interest included.
 Will be used to estimate the linear model}
 
-\item{censusdata}{dataset where the variable of interest is missing and shall
+\item{census}{dataset where the variable of interest is missing and shall
 be imputed}
 
 \item{location_survey}{string with the name of the variable in the survey data
 set that contains information about the cluster (= location) of an
 observation}
-
-\item{location_census}{string with the name of the variable in the survey data
-set that contains information about the cluster (= location) of an
-observation. Only needed if \code{clustermeans} shall be computed.}
 
 \item{n_boot}{integer with size of bootstrap sample}
 
@@ -35,27 +31,34 @@ observation. Only needed if \code{clustermeans} shall be computed.}
 \item{welfare.function}{function that transforms the bootstraped variable of
 interested to obtain some welfare estimate}
 
+\item{transfy}{function to transform the response y in the model}
+
+\item{transfy_inv}{inverse function of \code{transfy} for backtransformation}
+
 \item{output}{character string or character vector. Either "default", "all",
 or a vector with one or more of the following elements: c("summary",
 "yboot", "model_fit", "bootsample", "survey", "census")}
 
-\item{num_cores}{either a string, "auto", or an integer value indicating the
-number of cores to be used for the estimation.}
+\item{cores_c}{either a string, "auto", or an integer value indicating the
+number of cores to be used for the estimation in C++.}
+
+\item{cores_r}{either a string, "auto", or an integer value indicating the
+number of cores to be used for the estimation in R.}
 
 \item{quantiles}{vector of requested quantiles for the \code{summaryboot}
 output as decimals between 0 and 1.}
-
-\item{save_boot}{logical value. TRUE saves the bootstrap sample as
-BootstrapSampleELLsae-DATE.csv in your current working direktory.}
-
-\item{transfy}{function to transform the response y in the model}
-
-\item{transfy_inv}{inverse function of \code{transfy} for backtransformation}
 
 \item{clustermeans}{character vector with names of variables present in both
 data sets. The mean of those variables in the census will be computed by
 location and added to the survey data set before estimation of the linear
 model. This may enhance precision of your estimates}
+
+\item{location_census}{string with the name of the variable in the survey data
+set that contains information about the cluster (= location) of an
+observation. Only needed if \code{clustermeans} shall be computed.}
+
+\item{save_boot}{logical value. TRUE saves the bootstrap sample as
+BootstrapSampleELLsae-DATE.csv in your current working direktory.}
 }
 \value{
 \code{ellsae} returns a list. By default, this list included a matrix
@@ -71,7 +74,9 @@ The function \code{ellsae_big} implements the "ELL-method" method for
  small area estimation by Elbers, C., Lanjouw, J. O. and Lanjouw, P (2003)
  used to impute a missing variable from a smaller survey dataset into a
  census. The imputation is based on a linear model and bootstrap samples. 
- \code{ellsae_big} provides the same functionality as \code{\link{ellsae}}
+ \code{ellsae_big} provides the same functionality as \code{\link{ellsae}}, 
+ but trades a speed penalty for the ability to work with much larger data sets
+ that are not restricted by RAM size.
 }
 \details{
 The function takes the the surveydata and uses the argument
@@ -108,9 +113,15 @@ function was specified it will be used to transform the bootstrap sample. It
 will be diretly applied to the matrix of bootstrap samples, i.e.
 \code{welfare.function(bootstrap)}.
 
-\code{num_cores} specifies the number of cores to use for the calculation. As
+\code{cores_c} specifies the number of cores to use for the calculation. As
 parallelization is done in C++ and incurs little overhead this should in most
 cases be left to "auto".
+
+\code{cores_r} specifies the number of cores to used for calculations in R.
+The method of parallelization is the one implemented in the pacakge
+\code{\link{[foreach]}}. Parallelization does come with a signifacnt overhead,
+the default is therefore 1. "auto" invokes \code{\link{[bigstatsr]nb_cores()}}
+and creates clusters according to the number of physical CPUs available.
 
 To obtain reproducicble results, seed must be specified. Simply running
 \code{set.seed()} in R does not work. Providing a seed will not permanently
@@ -125,20 +136,21 @@ survey <- brazil[helper,]
 census <- brazil[-helper,]
 model.example <- hh_inc ~ geo2_br + age + sex + computer + trash
 
-ELLsae::ellsae(model = model.example,
-               surveydata = survey,
-               censusdata = census,
+ELLsae::ellsae_big(model = model.example,
+               survey = survey,
+               census = census,
                location_survey = "geo2_br",
                n_boot = 250L,
                seed = 1234,
                transfy = log,
                transfy_inv = exp,
                output = "all",
-               num_cores = "auto",
+               cores_c = "auto",
+               cores_r = 1,
                quantiles = c(0, 0.25, 0.5, 0.75, 1),
                clustermeans = "age",
                location_census = "geo2_br",
-               save_boot = F)
+               save_boot = FALSE)
 }
 \references{
 Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003).

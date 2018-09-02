@@ -14,7 +14,7 @@ df.census <- data.frame(a = (c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1)),
 random_control <- c()
 for (i in 1:7) {
 ellsae(model = y ~ a + b, clustermeans = "b",
-       surveydata = df.survey, censusdata = df.census,
+       survey = df.survey, census = df.census,
        location_survey = "a", seed = 12345,
        output = "all", n_boot = 50L)$yboot_est
 random_control[i] <- runif(1)
@@ -22,11 +22,11 @@ random_control[i] <- runif(1)
 
 test_that("setting a seed actually leads to the same result every time", {
   expect_equal(ellsae(model = y ~ a + b, clustermeans = "b",
-                      surveydata = df.survey, censusdata = df.census,
+                      survey = df.survey, census = df.census,
                       location_survey = "a", seed = 12345,
                       output = "all", n_boot = 50L)$yboot_est, 
                ellsae(model = y ~ a + b, clustermeans = "b",
-                      surveydata = df.survey, censusdata = df.census,
+                      survey = df.survey, census = df.census,
                       location_survey = "a", seed = 12345,
                       output = "all", n_boot = 50L)$yboot_est)
 })

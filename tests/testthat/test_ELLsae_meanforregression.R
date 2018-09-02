@@ -16,7 +16,7 @@ df.census <- data.frame(a = (c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1)),
 
 test_that("computing and attaching the means actually works", {
   expect_equal(ellsae(model = y ~ a + b, clustermeans = "b",
-                       surveydata = df.survey, censusdata = df.census,
+                       survey = df.survey, census = df.census,
                        location_survey = "a",
                        output = "all", n_boot = 50L)$survey$b_meanCensus,
                rep(aggregate(b ~ a, df.census, mean)$b, each = 3))
@@ -25,11 +25,11 @@ test_that("computing and attaching the means actually works", {
 test_that("All the error messages are pasted correctly at the right time", {
   #we compute means for a variable that isn't even part of the model
   expect_warning(ellsae(model = y ~ a + b, clustermeans = "d",
-                      surveydata = df.survey, censusdata = df.census,
+                      survey = df.survey, census = df.census,
                       location_survey = "a",
                       output = "all", n_boot = 50L))
   expect_error(ellsae(model = y ~ a + b, clustermeans = "b",
-                      surveydata = df.survey, censusdata = df.census,
+                      survey = df.survey, census = df.census,
                       location_survey = "a", location_census = "d",
                       output = "all", n_boot = 50L))
 })

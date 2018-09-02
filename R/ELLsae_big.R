@@ -98,9 +98,9 @@
 #'\code{\link[bigstatsr:nb_cores]{nb_cores}}
 #'and creates clusters according to the number of physical CPUs available.
 #'
-#'To obtain reproducicble results, a \code{seed} can be specified. Simply 
-#'running \code{set.seed()} in R does not work. 
-#'Beware, providing a seed will \strong{not} permanently alter the seed in R.
+#'To obtain reproducicble results, a \code{seed} can be specified. Simply
+#'running \code{set.seed()} in R does not work. providing a seed will not
+#'permanently alter the seed in R.
 #'
 #'@return \code{ellsae_big} returns a list. By default, this list included a 
 #'matrix
@@ -112,7 +112,7 @@
 #'effects and clustermeans added.
 #'
 #'@seealso Other small area estimation methods can also be found in the package
-#'  \code{\link[sae:sae-package]{sae-package}}.
+#'  \code{sae}.
 #'@keywords SAE, imputation
 #'@references Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003).
 #'\emph{Micro-Level Estimation of Poverty and Inequality}. In: Econometrica

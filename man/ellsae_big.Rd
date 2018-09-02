@@ -136,9 +136,9 @@ the default is therefore 1. "auto" invokes
 \code{\link[bigstatsr:nb_cores]{nb_cores}}
 and creates clusters according to the number of physical CPUs available.
 
-To obtain reproducicble results, a \code{seed} can be specified. Simply 
-running \code{set.seed()} in R does not work. 
-Beware, providing a seed will \strong{not} permanently alter the seed in R.
+To obtain reproducicble results, a \code{seed} can be specified. Simply
+running \code{set.seed()} in R does not work. providing a seed will not
+permanently alter the seed in R.
 }
 \examples{
 # Generate a sample survey and census data from the provided brazil data set

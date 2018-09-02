@@ -349,7 +349,7 @@ ellsae_big <- function(model,
     cores_r <- bigstatsr::nb_cores()
   }
   if (!is.integer(cores_r)) {
-    cores_r <- try(as.integer(cores_c), silent = T) 
+    cores_r <- try(as.integer(cores_r), silent = T) 
     if (!is.integer(cores_r)) {
       stop("cores_r has to be either 'auto' or a single integer")
     }

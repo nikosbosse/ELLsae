@@ -17,8 +17,8 @@ library(profvis)
 
 #ohne Parallelisierung, ohne FBM
 (prof <- profvis({
-  #y <- ellsae(output = "all", model = mod, survey = surv, quantiles = c(0, 0.4,0.8, 1), census = cens, location_survey = loc, n_boot = 250L, seed = 5, cores = "auto")
-  y2 <- ellsae_big(output = "all", model = mod, survey = surv, quantiles = c(0, 0.4,0.8, 1), census = cens, location_survey = loc, n_boot = 250L, seed = 5)
+  #y <- ellsae(model = mod, survey = surv, quantiles = c(0, 0.4,0.8, 1), census = cens, location_survey = loc, n_boot = 250L, seed = 5, cores = "auto")
+  y2 <- ellsae_big(model = mod, survey = surv, quantiles = c(0, 0.4,0.8, 1), census = cens, location_survey = loc, n_boot = 250L, seed = 5)
 
 }))
 
@@ -29,9 +29,23 @@ all(round(y$summary_boot - y2$summary_boot,5) == 0)
 
 
 microbenchmark::microbenchmark(
-y <- ellsae(model = mod, survey = surv, quantiles = c(0, 0.4,0.8, 1), census = cens, location_survey = loc, n_boot = 250L, seed = 5),
-y2 <- ellsae_big(model = mod, survey = surv, quantiles = c(0, 0.4,0.8, 1), census = cens, location_survey = loc, n_boot = 250L, seed = 5),
-times = 5
+
+y2 <- ellsae(output = c("yboot_est", "summary"), model = mod, 
+                 survey = surv, quantiles = c(0, 0.4,0.8, 1), 
+                 census = cens, location_survey = loc, 
+                 n_boot = 250L, seed = 5,
+                 clustermeans = c("age", "sex"), 
+                 transfy = log, transfy_inv = exp, welfare.function = function(x){x^2}),
+  
+y2 <- ellsae_big(output = c("yboot_est", "summary"), model = mod, 
+                 survey = surv, quantiles = c(0, 0.4,0.8, 1), 
+                 census = cens, location_survey = loc, 
+                 n_boot = 250L, seed = 5,
+                 clustermeans = c("age", "sex"), 
+                 transfy = log, transfy_inv = exp, welfare.function = function(x){x^2}),
+
+
+times = 10
 )
 
 

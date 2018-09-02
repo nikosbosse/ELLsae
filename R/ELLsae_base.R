@@ -274,7 +274,7 @@ ellsae <- function(model,
     })
     set.seed(seed)
   } else {
-    seed <- as.numeric(Sys.time()) # seed needed for C++
+    seed <- as.numeric(Sys.time()) # some seed needed for C++
   }
   # check whether seed is now correctly specified
   if (length(seed) != 1) {
@@ -550,6 +550,7 @@ ellsae <- function(model,
           output == "all" | 
           output == "yboot"  |
           output == "yboot_est")) {
+    #second condition checks whether mean has been calculated
     if (any(output == "default" |
             output == "all" | 
             output == "summary"  |

@@ -10,7 +10,7 @@ ellsae(model, survey, census, location_survey, n_boot = 250L, seed,
   location_census, save_boot = F)
 }
 \arguments{
-\item{model}{a model that describes the relationship betwenn the response and
+\item{model}{a model that describes the relationship between the response and
 the explanatory variables. Input must be a linear model that can be
 processed by \code{lm()}}
 
@@ -24,11 +24,11 @@ be imputed}
 set that contains information about the cluster (= location) of an
 observation}
 
-\item{n_boot}{integer with size of bootstrap sample}
+\item{n_boot}{integer indicating the size of the bootstrap sample}
 
 \item{seed}{integer, seed can be set to obtain reproducible results}
 
-\item{welfare.function}{function that transforms the bootstraped variable of
+\item{welfare.function}{function that transforms the bootstrapped variable of
 interested to obtain some welfare estimate}
 
 \item{transfy}{function to transform the response y in the model}
@@ -43,7 +43,7 @@ or a vector with one or more of the following elements: c("summary",
 number of cores to be used for the estimation.}
 
 \item{quantiles}{vector of requested quantiles for the \code{summaryboot}
-output as decimals between 0 and 1.}
+output defined as decimals between 0 and 1.}
 
 \item{clustermeans}{character vector with names of variables present in both
 data sets. The mean of those variables in the census will be computed by
@@ -52,7 +52,7 @@ model. This may enhance precision of your estimates}
 
 \item{location_census}{string with the name of the variable in the survey data
 set that contains information about the cluster (= location) of an
-observation. Only needed if \code{clustermeans} shall be computed.}
+observation. Only needed if \code{clustermeans} are computed.}
 
 \item{save_boot}{logical value. TRUE saves the bootstrap sample as
 BootstrapSampleELLsae-DATE.csv in your current working direktory.}
@@ -119,9 +119,9 @@ observation are arranged row-wise.
 parallelization is done in C++ and incurs little overhead this should in most
 cases be left to "auto".
 
-To obtain reproducicble results, seed must be specified. Simply running
-\code{set.seed()} in R does not work. Providing a seed will not permanently
-alter the seed in R.
+To obtain reproducicble results, a \code{seed} can be specified. Simply 
+running \code{set.seed()} in R does not work. 
+Beware, providing a seed will \strong{not} permanently alter the seed in R.
 }
 \examples{
 # Generate a sample survey and census data from the provided brazil data set
@@ -158,7 +158,7 @@ of small area estimation methods for poverty mapping}. In: 17 (Mar. 2016),
 }
 \seealso{
 Other small area estimation methods can also be found in the package
- \code{sae}.
+ \code{\link[sae:sae-package]{sae-package}}.
 }
 \keyword{SAE,}
 \keyword{imputation}

@@ -20,8 +20,10 @@ is left omitted. +
 }
 \section{ELLsae functions}{
 
-Contains two functions one for normal use cases called \code{ellsae} and a 
-second one called \code{ellsae_big} that can be used if RAM consumption 
+Contains two functions one for normal use cases called 
+\code{\link[ELLsae:ellsae]{ellsae}} and a 
+second one called \code{\link[ELLsae:ellsae_big]{ellsae_big}} 
+that can be used if RAM consumption 
 becomes an issue but which is slower that the basic version.
 }
 

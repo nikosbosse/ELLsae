@@ -11,8 +11,8 @@ df.census <- data.frame(a = (c(1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1)),
 model = y ~ a + b
 location_survey = "a"
 
-test_that("outputs of ellsea and ellsea_big equal?", {
-  expect_equal(trunc(ellsae(model = y ~ a + b, clustermeans = "b",
+test_that("outputs of ellsea and ellsea_big are truncated equal?", {
+  expect_identical(trunc(ellsae(model = y ~ a + b, clustermeans = "b",
                       survey = df.survey, census = df.census,
                       location_survey = "a", seed = 12345,
                       output = "all", n_boot = 50L)$summary_boot[,1]),
@@ -21,4 +21,19 @@ test_that("outputs of ellsea and ellsea_big equal?", {
                                 census = df.census,
                                 location_survey = "a", seed = 12345,
                                 output = "all", n_boot = 50L)$summary_boot[,1]))
+})
+
+test_that("outputs of ellsea and ellsea_big are rounded to two digits equal?", {
+  expect_equal(round(ellsae(model = y ~ a + b, clustermeans = "b",
+                                survey = df.survey, census = df.census,
+                                location_survey = "a", seed = 12345,
+                                output = "all", n_boot = 50L)$summary_boot[,1],
+                     digits = 2),
+                round(ellsae_big(model = y ~ a + b, clustermeans = "b",
+                                    survey = df.survey, 
+                                    census = df.census,
+                                    location_survey = "a", seed = 12345,
+                                    output = "all", 
+                                    n_boot = 50L)$summary_boot[,1], 
+                    digits = 2))
 })

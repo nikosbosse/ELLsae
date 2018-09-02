@@ -1,7 +1,9 @@
 #' ELLsae: A package for small area estimation
 #' @section ELLsae functions:
-#' Contains two functions one for normal use cases called \code{ellsae} and a 
-#' second one called \code{ellsae_big} that can be used if RAM consumption 
+#' Contains two functions one for normal use cases called 
+#' \code{\link[ELLsae:ellsae]{ellsae}} and a 
+#' second one called \code{\link[ELLsae:ellsae_big]{ellsae_big}} 
+#' that can be used if RAM consumption 
 #' becomes an issue but which is slower that the basic version.
 #' @description A method for small area estimation.
 #' @details  The method for small area estimation added by this package is 

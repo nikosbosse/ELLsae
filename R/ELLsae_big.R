@@ -1,13 +1,15 @@
 #'@title ellsae_big
-#'@description The function \code{ellsae_big} implements the "ELL-method" method for
+#'@description The function \code{ellsae_big} implements the "ELL-method" method 
+#'for
 #'  small area estimation by Elbers, C., Lanjouw, J. O. and Lanjouw, P (2003)
 #'  used to impute a missing variable from a smaller survey dataset into a
 #'  census. The imputation is based on a linear model and bootstrap samples. 
-#'  \code{ellsae_big} provides the same functionality as \code{\link{ellsae}}, 
-#'  but trades a speed penalty for the ability to work with much larger data sets
-#'  that are not restricted by RAM size. 
+#'  \code{ellsae_big} provides the same functionality as 
+#'  \code{\link[ELLsae:ellsae]{ellsae}}, 
+#'  but trades a speed penalty for the ability to work with much larger 
+#'  data sets that are not restricted by RAM size. 
 #'
-#'@param model a model that describes the relationship betwenn the response and
+#'@param model a model that describes the relationship between the response and
 #'  the explanatory variables. Input must be a linear model that can be
 #'  processed by \code{lm()}
 #'@param survey data set with the response variable of interest included.
@@ -17,9 +19,9 @@
 #'@param location_survey string with the name of the variable in the survey data
 #'  set that contains information about the cluster (= location) of an
 #'  observation
-#'@param n_boot integer with size of bootstrap sample
+#'@param n_boot integer indicating the size of the bootstrap sample
 #'@param seed integer, seed can be set to obtain reproducible results
-#'@param welfare.function function that transforms the bootstraped variable of
+#'@param welfare.function function that transforms the bootstrapped variable of
 #'interested to obtain some welfare estimate
 #'@param transfy function to transform the response y in the model
 #'@param transfy_inv inverse function of \code{transfy} for backtransformation
@@ -31,18 +33,16 @@
 #'@param cores_r either a string, "auto", or an integer value indicating the
 #'  number of cores to be used for the estimation in R. 
 #'@param quantiles vector of requested quantiles for the \code{summaryboot}
-#'  output as decimals between 0 and 1.
+#'  output defined as decimals between 0 and 1.
 #'@param clustermeans character vector with names of variables present in both
 #'  data sets. The mean of those variables in the census will be computed by
 #'  location and added to the survey data set before estimation of the linear
 #'  model. This may enhance precision of your estimates
 #'@param location_census string with the name of the variable in the survey data
 #'  set that contains information about the cluster (= location) of an
-#'  observation. Only needed if \code{clustermeans} shall be computed.
+#'  observation. Only needed if \code{clustermeans} are computed.
 #'@param save_boot logical value. TRUE saves the bootstrap sample as
 #'  BootstrapSampleELLsae-DATE.csv in your current working direktory.
-#'
-
 #'
 #'@details The function takes the the surveydata and uses the argument
 #'\code{model} to estimate a linear model of the type \code{lm()}. In case the
@@ -92,15 +92,18 @@
 #'
 #'\code{cores_r} specifies the number of cores to used for calculations in R.
 #'The method of parallelization is the one implemented in the pacakge
-#'\code{\link{[foreach]}}. Parallelization does come with a signifacnt overhead,
-#'the default is therefore 1. "auto" invokes \code{\link{[bigstatsr]nb_cores()}}
+#'\code{\link[foreach]{foreach}}. Parallelization does come with a signifacnt 
+#'overhead,
+#'the default is therefore 1. "auto" invokes 
+#'\code{\link[bigstatsr:nb_cores]{nb_cores}}
 #'and creates clusters according to the number of physical CPUs available.
 #'
-#'To obtain reproducicble results, seed must be specified. Simply running
-#'\code{set.seed()} in R does not work. Providing a seed will not permanently
-#'alter the seed in R.
+#'To obtain reproducicble results, a \code{seed} can be specified. Simply 
+#'running \code{set.seed()} in R does not work. 
+#'Beware, providing a seed will \strong{not} permanently alter the seed in R.
 #'
-#'@return \code{ellsae} returns a list. By default, this list included a matrix
+#'@return \code{ellsae_big} returns a list. By default, this list included a 
+#'matrix
 #'with basic summary statistics as specified in \code{quantiles}, a vector with
 #'the means of the bootstrap samples for every observation, and the
 #'\code{lm}-object obtained from the linear model estimation. In addition, the
@@ -108,9 +111,8 @@
 #'data.table of the survey and census data set with residuals and location
 #'effects and clustermeans added.
 #'
-#'
 #'@seealso Other small area estimation methods can also be found in the package
-#'  \code{sae}.
+#'  \code{\link[sae:sae-package]{sae-package}}.
 #'@keywords SAE, imputation
 #'@references Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003).
 #'\emph{Micro-Level Estimation of Poverty and Inequality}. In: Econometrica
@@ -129,20 +131,20 @@
 #'model.example <- hh_inc ~ geo2_br + age + sex + computer + trash
 #'
 #' ELLsae::ellsae_big(model = model.example,
-#'                survey = survey,
-#'                census = census,
-#'                location_survey = "geo2_br",
-#'                n_boot = 250L,
-#'                seed = 1234,
-#'                transfy = log,
-#'                transfy_inv = exp,
-#'                output = "all",
-#'                cores_c = "auto",
-#'                cores_r = 1,
-#'                quantiles = c(0, 0.25, 0.5, 0.75, 1),
-#'                clustermeans = "age",
-#'                location_census = "geo2_br",
-#'                save_boot = FALSE)
+#'                    survey = survey,
+#'                    census = census,
+#'                    location_survey = "geo2_br",
+#'                    n_boot = 250L,
+#'                    seed = 1234,
+#'                    transfy = log,
+#'                    transfy_inv = exp,
+#'                    output = "all",
+#'                    cores_c = "auto",
+#'                    cores_r = 1,
+#'                    quantiles = c(0, 0.25, 0.5, 0.75, 1),
+#'                    clustermeans = "age",
+#'                    location_census = "geo2_br",
+#'                    save_boot = F)
 #'@export
 
 

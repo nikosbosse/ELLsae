@@ -10,7 +10,7 @@ ellsae_big(model, survey, census, location_survey, n_boot = 250L, seed,
   1), clustermeans, location_census, save_boot = F)
 }
 \arguments{
-\item{model}{a model that describes the relationship betwenn the response and
+\item{model}{a model that describes the relationship between the response and
 the explanatory variables. Input must be a linear model that can be
 processed by \code{lm()}}
 
@@ -24,11 +24,15 @@ be imputed}
 set that contains information about the cluster (= location) of an
 observation}
 
+<<<<<<< HEAD
+\item{n_boot}{integer indicating the size of the bootstrap sample}
+=======
 \item{n_boot}{integer with size of bootstrap sample}
+>>>>>>> 9c90aac2ee092bca3e8bb83a0a85f333358f1aa5
 
 \item{seed}{integer, seed can be set to obtain reproducible results}
 
-\item{welfare.function}{function that transforms the bootstraped variable of
+\item{welfare.function}{function that transforms the bootstrapped variable of
 interested to obtain some welfare estimate}
 
 \item{transfy}{function to transform the response y in the model}
@@ -41,6 +45,15 @@ or a vector with one or more of the following elements: c("summary",
 
 \item{cores_c}{either a string, "auto", or an integer value indicating the
 number of cores to be used for the estimation in C++.}
+<<<<<<< HEAD
+
+\item{cores_r}{either a string, "auto", or an integer value indicating the
+number of cores to be used for the estimation in R.}
+
+\item{quantiles}{vector of requested quantiles for the \code{summaryboot}
+output defined as decimals between 0 and 1.}
+
+=======
 
 \item{cores_r}{either a string, "auto", or an integer value indicating the
 number of cores to be used for the estimation in R.}
@@ -48,6 +61,7 @@ number of cores to be used for the estimation in R.}
 \item{quantiles}{vector of requested quantiles for the \code{summaryboot}
 output as decimals between 0 and 1.}
 
+>>>>>>> 9c90aac2ee092bca3e8bb83a0a85f333358f1aa5
 \item{clustermeans}{character vector with names of variables present in both
 data sets. The mean of those variables in the census will be computed by
 location and added to the survey data set before estimation of the linear
@@ -55,13 +69,18 @@ model. This may enhance precision of your estimates}
 
 \item{location_census}{string with the name of the variable in the survey data
 set that contains information about the cluster (= location) of an
+<<<<<<< HEAD
+observation. Only needed if \code{clustermeans} are computed.}
+=======
 observation. Only needed if \code{clustermeans} shall be computed.}
+>>>>>>> 9c90aac2ee092bca3e8bb83a0a85f333358f1aa5
 
 \item{save_boot}{logical value. TRUE saves the bootstrap sample as
 BootstrapSampleELLsae-DATE.csv in your current working direktory.}
 }
 \value{
-\code{ellsae} returns a list. By default, this list included a matrix
+\code{ellsae_big} returns a list. By default, this list included a 
+matrix
 with basic summary statistics as specified in \code{quantiles}, a vector with
 the means of the bootstrap samples for every observation, and the
 \code{lm}-object obtained from the linear model estimation. In addition, the
@@ -70,7 +89,8 @@ data.table of the survey and census data set with residuals and location
 effects and clustermeans added.
 }
 \description{
-The function \code{ellsae_big} implements the "ELL-method" method for
+The function \code{ellsae_big} implements the "ELL-method" method 
+for
  small area estimation by Elbers, C., Lanjouw, J. O. and Lanjouw, P (2003)
  used to impute a missing variable from a smaller survey dataset into a
  census. The imputation is based on a linear model and bootstrap samples. 
@@ -127,6 +147,17 @@ cases be left to "auto".
 
 \code{cores_r} specifies the number of cores to used for calculations in R.
 The method of parallelization is the one implemented in the pacakge
+<<<<<<< HEAD
+\code{\link[foreach]{foreach}}. Parallelization does come with a signifacnt 
+overhead,
+the default is therefore 1. "auto" invokes 
+\code{\link[bigstatsr:nb_cores]{nb_cores}}
+and creates clusters according to the number of physical CPUs available.
+
+To obtain reproducicble results, a \code{seed} can be specified. Simply 
+running \code{set.seed()} in R does not work. 
+Beware, providing a seed will \strong{not} permanently alter the seed in R.
+=======
 \code{\link{[foreach]}}. Parallelization does come with a signifacnt overhead,
 the default is therefore 1. "auto" invokes \code{\link{[bigstatsr]nb_cores()}}
 and creates clusters according to the number of physical CPUs available.
@@ -134,6 +165,7 @@ and creates clusters according to the number of physical CPUs available.
 To obtain reproducicble results, seed must be specified. Simply running
 \code{set.seed()} in R does not work. Providing a seed will not permanently
 alter the seed in R.
+>>>>>>> 9c90aac2ee092bca3e8bb83a0a85f333358f1aa5
 }
 \examples{
 # Generate a sample survey and census data from the provided brazil data set
@@ -145,6 +177,22 @@ census <- brazil[-helper,]
 model.example <- hh_inc ~ geo2_br + age + sex + computer + trash
 
 ELLsae::ellsae_big(model = model.example,
+<<<<<<< HEAD
+                   survey = survey,
+                   census = census,
+                   location_survey = "geo2_br",
+                   n_boot = 250L,
+                   seed = 1234,
+                   transfy = log,
+                   transfy_inv = exp,
+                   output = "all",
+                   cores_c = "auto",
+                   cores_r = 1,
+                   quantiles = c(0, 0.25, 0.5, 0.75, 1),
+                   clustermeans = "age",
+                   location_census = "geo2_br",
+                   save_boot = F)
+=======
                survey = survey,
                census = census,
                location_survey = "geo2_br",
@@ -159,6 +207,7 @@ ELLsae::ellsae_big(model = model.example,
                clustermeans = "age",
                location_census = "geo2_br",
                save_boot = FALSE)
+>>>>>>> 9c90aac2ee092bca3e8bb83a0a85f333358f1aa5
 }
 \references{
 Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003).
@@ -171,7 +220,7 @@ of small area estimation methods for poverty mapping}. In: 17 (Mar. 2016),
 }
 \seealso{
 Other small area estimation methods can also be found in the package
- \code{sae}.
+ \code{\link[sae:sae-package]{sae-package}}.
 }
 \keyword{SAE,}
 \keyword{imputation}

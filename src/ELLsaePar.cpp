@@ -44,6 +44,13 @@ SEXP InfCensCpp(const int n_bootstrap,
   // initialize and fill matrix for randam locations and residuals 
   Eigen::MatrixXd LocationEffectResiduals(n_obs_censusdata, n_bootstrap);
   
+#ifdef _OPENMP
+  if (ncores == 999){
+    ncores = omp_get_max_threads() - 1;
+  }
+#endif
+  
+  
 #pragma omp parallel num_threads(ncores)
 {
   dqrng::xoshiro256plus lgen(gen);      // make thread local copy of rng 
@@ -84,6 +91,11 @@ SEXP summaryParC(Eigen::MatrixXd x,
     }
   }
   
+#ifdef _OPENMP
+  if (ncores == 999){
+    ncores = omp_get_max_threads() - 1;
+  }
+#endif
   
 #pragma omp parallel num_threads(ncores)
 {
@@ -201,7 +213,11 @@ void InfCensBigCpp(Environment fbm, const int n_bootstrap,
   // initialize and fill matrix for randam locations and residuals
   Eigen::MatrixXd LocationEffectResiduals(n_obs_censusdata, n_bootstrap);
   
-  
+#ifdef _OPENMP
+  if (ncores == 999){
+    ncores = omp_get_max_threads() - 1;
+  }
+#endif 
   
 #pragma omp parallel num_threads(ncores)
 {
@@ -300,6 +316,13 @@ SEXP summaryBigParCt(Environment fbm,
       indices[k+1] = ceil(quantiles[k] * (nrow-1));
     }
   }
+  
+#ifdef _OPENMP
+  if (ncores == 999){
+    ncores = omp_get_max_threads() - 1;
+  }
+#endif
+  
   #pragma omp parallel num_threads(ncores)
   {
   #pragma omp for schedule(dynamic)

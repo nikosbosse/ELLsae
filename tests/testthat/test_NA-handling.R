@@ -32,19 +32,6 @@ explanatories <- all.vars(model)[-1]
 location_survey = "a"
 
 
-## test ##
-# unique because the location_survey can also be in the model already
-# all.variables <- unique(c(response,
-#                           explanatories,
-#                           location_survey))
-# if (any(is.na(surveydata[, ..all.variables]))) {
-#   
-#   surveydata <- surveydata[complete.cases(surveydata[, ..all.variables])]
-# }
-# 
-
-## test ende ##
-
 test_that("If there are NA in the explanatories they are correctly omitted", {
   expect_warning(nrow(ellsae(model = y ~ a + b, clustermeans = "b",
                            surveydata = df.survey.NAexpl, censusdata = df.census,
@@ -53,21 +40,13 @@ test_that("If there are NA in the explanatories they are correctly omitted", {
                  "your surveydata had missing values. Affected rows were removed.")
 })
 
-test_that("If there are NA in the location_survey 
-          variable an error is thrown", {
-  # expect_error(ellsae(model = y ~ a + b, clustermeans = "b",
-  #                     surveydata = df.survey.NAloc, censusdata = df.census,
-  #                     location_survey = "a", seed = 12345,
-  #                     output = "all", n_boot = 50L))
-  expect_error(ellsae(model = y ~ a + b, clustermeans = "b",
+test_that("If there are NA in the location_census variable and clustermeans
+          is used, then an error is thrown", {
+  expect_error(ellsae(model = y ~ b, clustermeans = "b",
                       surveydata = df.survey, 
                       censusdata = df.census.NAloc,
                       location_survey = "a", seed = 12345,
                       output = "all", n_boot = 50L))
   
-  # expect_error(ellsae(model = y ~ a + b, clustermeans = "b",
-  #                       surveydata = df.survey.NAexpl, censusdata = df.census,
-  #                       location_survey = "a", seed = 12345,
-  #                       output = "all", n_boot = 50L))
             
 })

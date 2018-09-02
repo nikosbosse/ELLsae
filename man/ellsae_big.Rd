@@ -10,106 +10,148 @@ ellsae_big(model, surveydata, censusdata, location_survey, location_census,
   0.75, 1), save_boot = F)
 }
 \arguments{
-\item{model}{a model that is specified for the relationship betwenn the
-response varibale and the regressors. Model must be a linear model that can
-be processed by \code{lm()}}
+\item{model}{a model that describes the relationship betwenn the response and
+the explanatory variables. Input must be a linear model that can be
+processed by \code{lm()}}
 
-\item{surveydata}{Smaller surveydata with additional response variable of
-interest. Will be used to estimate the linear model}
+\item{surveydata}{data set with the response variable of interest included.
+Will be used to estimate the linear model}
 
-\item{censusdata}{The dataset in which a certain variable is supposed to be
-imputed}
+\item{censusdata}{dataset where the variable of interest is missing and shall
+be imputed}
 
-\item{location_survey}{Name of location variable or vector for the survey
-data which is used for error correction and the location means (if
-\code{clustermeans} is specified)}
+\item{location_survey}{string with the name of the variable in the survey data
+set that contains information about the cluster (= location) of an
+observation}
 
-\item{location_census}{name of location variable (string) in the census data
-which is used for error correction and location means.
-If \code{clustermeans} has an a variable and
-\code{location_census} is missing, name of the \code{location_survey}
-variable is tried.}
+\item{location_census}{string with the name of the variable in the survey data
+set that contains information about the cluster (= location) of an
+observation. Only needed if \code{clustermeans} shall be computed.}
 
-\item{n_boot}{Number of bootstrap samples used for the estimation, default is
-\code{n_boot = 50}}
+\item{n_boot}{integer with size of bootstrap sample}
 
-\item{seed}{to make research reproducible a seed can be set. Simple
-\code{set.seed()} in R wont work as functions run in \code{C++}.
-Seed is again randomized after running the function.}
+\item{seed}{integer, seed can be set to obtain reproducible results}
 
-\item{welfare.function}{Additionally a welfare function for the response can
-be specified}
+\item{welfare.function}{function that transforms the bootstraped variable of
+interested to obtain some welfare estimate}
 
-\item{output}{as "default" a list with ... is returned. Write "all" for all
-possible outputs or specify outputs yourself in a vector.}
+\item{output}{character string or character vector. Either "default", "all",
+or a vector with one or more of the following elements: c("summary",
+"yboot", "model_fit", "bootsample", "survey", "census")}
 
-\item{num_cores}{utilizes the given number of cores to speed up the
-estimation. The number of cores can be determined by
-parallel::detectCores() - 1 or bigstatsr::nb_cores() that returnes only
-physical cores.}
+\item{num_cores}{either a string, "auto", or an integer value indicating the
+number of cores to be used for the estimation.}
 
 \item{quantiles}{vector of requested quantiles for the \code{summaryboot}
 output as decimals between 0 and 1.}
 
-\item{save_boot}{logical indicator if the bootstraps of the response y are
-supposed to be saved as a CSV file under your current working direktory.
-The name is: BootstrapSampleELLsae-DATE.csv}
+\item{save_boot}{logical value. TRUE saves the bootstrap sample as
+BootstrapSampleELLsae-DATE.csv in your current working direktory.}
 
 \item{transfy}{function to transform the response y in the model}
 
-\item{transfy_inv}{function for backtransformation of \code{transf}}
+\item{transfy_inv}{inverse function of \code{transfy} for backtransformation}
 
-\item{clustermeans}{Additional parameters for the regression based on
-location means calculated from the census data to account for the lack of
-information in a small survey}
+\item{clustermeans}{character vector with names of variables present in both
+data sets. The mean of those variables in the census will be computed by
+location and added to the survey data set before estimation of the linear
+model. This may enhance precision of your estimates}
 }
 \value{
-Use this function over \code{ellsae} if that one fails because the
-census matrix is really large and you are trying to draw many bootstrap
-samples. Generally \code{ellsae} is faster and more efficient.
-
-The function takes the the typically smaller surveydata and uses the
-argument \code{model} to estimate a linear model of the type \code{lm()}. In case
-the argument \code{clustermeans} is specified means from the cluster data for the given
-variables are calculated and merged with the survey databy cluster locations. These
-new explanatory variables are also used for the estimation of the linear model.
-
-In the second step a C++ fuction takes over and calculates \code{nboot} predicted
-Y´s by using the betas from the first step to draw from a multivariate normal distribution
-and draws indicidual and nested errors at random with replacement. If requested the Y´s
-are used to estimate the welfare function after which either the mean of the yhat or of the
-welfare fuctiom is returned.
-
-The function returns a list with different objects. If \code{output}
-is left unspecified the estimated Y´s or welfare estimates \code{yhat},
-the fit of the linear model \code{model_fit} and a summary of the bootstrap samples
-\code{bootstrapCI} are returned.
-
-If \code{output} is specified all the arguments given are returned. Next to the
-above the following inputs are possible, \code{surveydata} and \code{censusdata}
-return the data frames used for the compution as some rows might be deleted due
-to NA handling and additional variables are created for \code{clustermeans}.
-
-Additionally the bootstrapped Y´s can be saved as a CSV if \code{save_yboot} is
-set equal \code{TRUE} and can be found under the current working directory as
-"Bootraps-of-Y.csv".
+\code{ellsae} returns a list. By default, this list included a matrix
+with basic summary statistics as specified in \code{quantiles}, a vector with
+the means of the bootstrap samples for every observation, and the
+\code{lm}-object obtained from the linear model estimation. In addition, the
+user can request the full matrix of bootstrap samples, and an updated
+data.table of the survey and census data set with residuals and location
+effects and clustermeans added.
 }
 \description{
-\code{ellsae_big} is a method for small area estimation used to
-impute a missing
-variable from a smaller survey dataset into a census.The imputation is based
-on a linear model and bootstrap samples.
+The function \code{ellsae_big} implements the "ELL-method" method for
+ small area estimation by Elbers, C., Lanjouw, J. O. and Lanjouw, P (2003)
+ used to impute a missing variable from a smaller survey dataset into a
+ census. The imputation is based on a linear model and bootstrap samples. 
+ \code{ellsae_big} provides the same functionality as \code{\link{ellsae}}
+}
+\details{
+The function takes the the surveydata and uses the argument
+\code{model} to estimate a linear model of the type \code{lm()}. In case the
+argument \code{clustermeans} is specified, means from the census data for the
+given variables are calculated and merged with the survey data by cluster
+locations. These new explanatory variables are also used for the estimation of
+the linear model. Rows with NA's are omitted from the computation.
+
+The user may choose to transform the response variable using
+a function, \code{transfy} previously to estimating the model.
+This function will be directly applied to the vector of the response
+variable, i.e. \code{transfy(response)}. In principle this could also be
+achieved by altering the specified model, but using \code{transfy} and
+\code{transfy_inv} is the recommended usage. 
+
+From the regression, location
+effects are calculated as the mean by location of the regression residuals.
+Individual random error terms are then obtained as the difference between the
+regression residuals and the location effects. The bootstrapped response
+variables are generated using three sources of randomness. The betas obtained
+from \code{lm()} are replaced by draws from a multivariate normal
+distribution. In addition random location effects and residuals are drawn with
+replacement. Internally the sample is a matrix, \code{bootstrap}, with
+the rows corresponding to bootstrap samples for one individual observation in
+the census data set. 
+
+If \code{transfy_inv} was specified, the bootstrap sample
+is transformed back. This function will be directly applied to the matrix
+of bootstrap samples, i.e. \code{transfy_inv(bootstrap)}. 
+
+If a welfare
+function was specified it will be used to transform the bootstrap sample. It
+will be diretly applied to the matrix of bootstrap samples, i.e.
+\code{welfare.function(bootstrap)}.
+
+\code{num_cores} specifies the number of cores to use for the calculation. As
+parallelization is done in C++ and incurs little overhead this should in most
+cases be left to "auto".
+
+To obtain reproducicble results, seed must be specified. Simply running
+\code{set.seed()} in R does not work. Providing a seed will not permanently
+alter the seed in R.
+}
+\examples{
+# Generate a sample survey and census data from the provided brazil data set
+brazil <-  ELLsae::brazil
+helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = F)
+helper <- sort(helper)
+survey <- brazil[helper,]
+census <- brazil[-helper,]
+model.example <- hh_inc ~ geo2_br + age + sex + computer + trash
+
+ELLsae::ellsae(model = model.example,
+               surveydata = survey,
+               censusdata = census,
+               location_survey = "geo2_br",
+               n_boot = 250L,
+               seed = 1234,
+               transfy = log,
+               transfy_inv = exp,
+               output = "all",
+               num_cores = "auto",
+               quantiles = c(0, 0.25, 0.5, 0.75, 1),
+               clustermeans = "age",
+               location_census = "geo2_br",
+               save_boot = F)
 }
 \references{
-Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003). \emph{Micro-Level Estimation of Poverty and Inequality}.
-  In: Econometrica 71.1, pp. 355-364, Jan 2003
+Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003).
+\emph{Micro-Level Estimation of Poverty and Inequality}. In: Econometrica
+71.1, pp. 355-364, Jan 2003
 
-  Guadarrama Sanz, M., Molina, I., and Rao, J.N.K.  (2016). \emph{A comparison of small
-  area estimation methods for poverty mapping}. In: 17 (Mar. 2016), 41-66 and 156 and 158.
+Guadarrama Sanz, M., Molina, I., and Rao, J.N.K.  (2016). \emph{A comparison
+of small area estimation methods for poverty mapping}. In: 17 (Mar. 2016),
+41-66 and 156 and 158.
 }
 \seealso{
-Other small area estimation methods can also be found
-in the package \code{sae}.
+Other small area estimation methods can also be found in the package
+ \code{sae}.
 }
 \keyword{SAE,}
 \keyword{imputation}

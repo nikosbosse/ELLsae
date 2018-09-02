@@ -112,7 +112,7 @@
 #'effects and clustermeans added.
 #'
 #'@seealso Other small area estimation methods can also be found in the package
-#'  \code{\link[sae:sae-package]{sae-package}}.
+#'  \code{sae}.
 #'@keywords SAE, imputation
 #'@references Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003).
 #'\emph{Micro-Level Estimation of Poverty and Inequality}. In: Econometrica

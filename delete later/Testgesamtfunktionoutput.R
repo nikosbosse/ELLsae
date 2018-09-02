@@ -11,14 +11,14 @@ rm(list = "helper") #delete helper
 mod <-  hh_inc ~ age + urban + sex + religion + adults + children
 loc <- "geo2_br"
 
-names(ELLsae::brazil)
 library(ELLsae)
+
 library(profvis)
 
 #ohne Parallelisierung, ohne FBM
 (prof <- profvis({
-  y <- ellsae(output = "all", model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 250L, seed = 5, cores = "auto")
-  y2 <- ellsae_big(output = "all", model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 250L, seed = 5)
+  y <- ellsae(output = "all", model = mod, survey = surv, quantiles = c(0, 0.4,0.8, 1), census = cens, location_survey = loc, n_boot = 250L, seed = 5, cores = "auto")
+  y2 <- ellsae_big(output = "all", model = mod, survey = surv, quantiles = c(0, 0.4,0.8, 1), census = cens, location_survey = loc, n_boot = 250L, seed = 5)
 
 }))
 
@@ -31,15 +31,15 @@ library(profvis)
 y <- ellsae(output = "all", model = mod, surveydata = surv, quantiles = c(0, 0.4,0.8, 1), censusdata = cens, location_survey = loc, n_boot = 250L, seed = 5, cores = "auto")
 
 y2 <- ellsae_big(output = c("yboot_est", "summary"), model = mod, 
-                 surveydata = surv, quantiles = c(0, 0.4,0.8, 1), 
-                 censusdata = cens, location_survey = loc, 
+                 survey = surv, quantiles = c(0, 0.4,0.8, 1), 
+                 census = cens, location_survey = loc, 
                  n_boot = 50L, seed = 5,
                  clustermeans = c("age", "sex"), 
                  transfy = log, transfy_inv = exp, welfare.function = function(x){x^2})
 
 debugonce(ellsae_big)
 
-surv[hh_inc == 0,]
+log(surv[["hh_inc"]])
 
 
 which(is.na(log(b)))

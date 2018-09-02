@@ -14,8 +14,8 @@ mfit <- lm(model, survdata)
 y_fit <- predict(mfit, newdata = censdata)
 
 test_that("the result is unbiased without any extra features", {
-  expect_equal(trunc(as.numeric(ellsae(model = model, surveydata = survdata, 
-                            censusdata = censdata, seed = 5,
+  expect_equal(trunc(as.numeric(ellsae(model = model, survey = survdata, 
+                            census = censdata, seed = 5,
                             location_survey = "c", 
                             n_boot = 5000)$yboot_est)),
                      trunc(as.numeric(y_fit)))

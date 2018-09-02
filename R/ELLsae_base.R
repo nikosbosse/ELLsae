@@ -110,8 +110,8 @@
 #'model.example <- hh_inc ~ geo2_br + age + sex + computer + trash
 #'
 #' ELLsae::ellsae(model = model.example,
-#'                surveydata = survey,
-#'                censusdata = census,
+#'                survey = survey,
+#'                census = census,
 #'                location_survey = "geo2_br",
 #'                n_boot = 250L,
 #'                seed = 1234,
@@ -127,8 +127,8 @@
 
 
 ellsae <- function(model,
-                   surveydata,
-                   censusdata,
+                   survey,
+                   census,
                    location_survey,
                    n_boot = 250L,
                    seed,
@@ -172,10 +172,14 @@ ellsae <- function(model,
   explanatories <- all.vars(model)[-1]
   
   ##### check whether surveydata is specified correctly and try to correct
-  if (missing(surveydata))
-    stop("Input surveydata is missing")
-  if (!is.data.table(surveydata)) {
-    surveydata <- try(as.data.table(surveydata), silent = T)
+  if (missing(survey))
+    stop("Input survey is missing")
+  if (is.data.table(survey)) {
+    # pass-by-reference behaviour of data.table would alter input outside the
+    # scope of this function. 
+    surveydata <- copy(survey) 
+  } else {
+    surveydata <- try(as.data.table(survey), silent = T)
     if (!is.data.table(surveydata)) {
       stop(
         "survey data should be provided as data.table or something similar
@@ -189,12 +193,23 @@ ellsae <- function(model,
     stop("the model you provided specifies variables
          that are not included in the surveydata")
   }
-  
+  # check for NA and remove 
+  if (any(is.na(surveydata[, c(..response, ..explanatories)]))) {
+    surveydata <- surveydata[complete.cases(surveydata[, c(..response, ..explanatories)]), ]
+    warning("your survey had missing values. Affected rows were removed.")
+  }
+  n_obs_survey <- nrow(surveydata)
+
   ##### check whether censusdata is specified correctly and try to correct
-  if (missing(censusdata))
-    stop("Data frame with the censusdata is missing")
-  if (!is.data.table(censusdata)) {
-    censusdata <- try(as.data.table(censusdata), silent = T)
+  if (missing(census)){
+    stop("Input census is missing")
+  }
+  if (is.data.table(census)) {
+    # pass-by-reference behaviour of data.table would alter input outside the
+    # scope of this function. 
+    censusdata <- copy(census) 
+  } else {
+    censusdata <- try(as.data.table(census), silent = T)
     if (!is.data.table(censusdata)) {
       stop(
         "census data should be provided as data.table or something similar
@@ -208,6 +223,12 @@ ellsae <- function(model,
     stop("the model you provided specifies variables
          that are not included in the censusdata")
   }
+  # remove NAs
+  if (any(is.na(censusdata[, c(..explanatories)]))) {
+    censusdata <- censusdata[complete.cases(censusdata[, c(..explanatories)]), ]
+    warning("your censusdata had missing values. Affected rows were removed.")
+  }
+  n_obs_census <- nrow(censusdata)
   
   ##### check whether the locations are specified correctly and try to correct
   if (missing(location_survey)) {
@@ -244,7 +265,7 @@ ellsae <- function(model,
     }
   }
   
-  # if a seed is specified, save the internal seed and restore it later
+  #### if a seed is specified, save the internal seed and restore it later
   if (!missing(seed)) {
     runif(1) # make sure R seed is set internally
     previousseed <- .Random.seed
@@ -255,8 +276,7 @@ ellsae <- function(model,
   } else {
     seed <- as.numeric(Sys.time()) # seed needed for C++
   }
-  
-  ##### check whether seed is now correctly specified
+  # check whether seed is now correctly specified
   if (length(seed) != 1) {
     stop("If you want to set a seed it has to be provided as single integer")
   }
@@ -275,6 +295,9 @@ ellsae <- function(model,
     } 
     #surveydata[, ..response := transfy(..response)]
     set(surveydata, j = response, value = transfy(surveydata[[response]]))
+    if (any(is.na(surveydata[,..response]))){
+      warning("transfy has produced NAs")
+    }
   }
   
   
@@ -321,21 +344,6 @@ ellsae <- function(model,
   }
   quantiles <- sort(quantiles) # sort to be safe for C++ - code
   
-  
-  
-  # check for NA and remove 
-  if (any(is.na(surveydata[, c(..response, ..explanatories)]))) {
-    surveydata <- surveydata[complete.cases(surveydata[, c(..response, ..explanatories)]), ]
-    warning("your surveydata had missing values. Affected rows were removed.
-            Maybe they were introduced through transfy?" )
-  }
-  if (any(is.na(censusdata[, c(..explanatories)]))) {
-    censusdata <- censusdata[complete.cases(censusdata[, c(..explanatories)]), ]
-    warning("your censusdata had missing values. Affected rows were removed.")
-  }
-
-  n_obs_survey <- nrow(surveydata)
-  n_obs_census <- nrow(censusdata)
   
   
   ######## clustermeans #######

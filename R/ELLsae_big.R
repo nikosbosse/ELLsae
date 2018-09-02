@@ -113,8 +113,8 @@
 #'model.example <- hh_inc ~ geo2_br + age + sex + computer + trash
 #'
 #' ELLsae::ellsae_big(model = model.example,
-#'                surveydata = survey,
-#'                censusdata = census,
+#'                survey = survey,
+#'                census = census,
 #'                location_survey = "geo2_br",
 #'                n_boot = 250L,
 #'                seed = 1234,
@@ -131,8 +131,8 @@
 
 
 ellsae_big <- function(model,
-                       surveydata,
-                       censusdata,
+                       survey,
+                       census,
                        location_survey,
                        n_boot = 250L,
                        seed,
@@ -161,7 +161,7 @@ ellsae_big <- function(model,
   #     regression
   
   
-  # check whether bigstatsr is available
+  #### check whether bigstatsr is available
   if(!requireNamespace("bigstatsr", quietly = TRUE)) {
     stop("Package \"bigstatsr\" needed for this function to work. 
          Please install it, i.e. run install.packages(bigstatsr)")
@@ -177,16 +177,20 @@ ellsae_big <- function(model,
       stop("model must either be provided as a formula or as a string.
            See ?formula for help")
     }
-  }
+    }
   # saving the model parameters to avoid recalculation later on
   response <- all.vars(model)[1]
   explanatories <- all.vars(model)[-1]
   
   ##### check whether surveydata is specified correctly and try to correct
-  if (missing(surveydata))
-    stop("Input surveydata is missing")
-  if (!is.data.table(surveydata)) {
-    surveydata <- try(as.data.table(surveydata), silent = T)
+  if (missing(survey))
+    stop("Input survey is missing")
+  if (is.data.table(survey)) {
+    # pass-by-reference behaviour of data.table would alter input outside the
+    # scope of this function. 
+    surveydata <- copy(survey) 
+  } else {
+    surveydata <- try(as.data.table(survey), silent = T)
     if (!is.data.table(surveydata)) {
       stop(
         "survey data should be provided as data.table or something similar
@@ -194,18 +198,29 @@ ellsae_big <- function(model,
         your input into a data.table"
       )
     }
-  }
+    }
   # all the variables of the model have to be in the data as well
   if (!all(explanatories %in%  names(surveydata))) {
     stop("the model you provided specifies variables
          that are not included in the surveydata")
   }
+  # check for NA and remove 
+  if (any(is.na(surveydata[, c(..response, ..explanatories)]))) {
+    surveydata <- surveydata[complete.cases(surveydata[, c(..response, ..explanatories)]), ]
+    warning("your survey had missing values. Affected rows were removed.")
+  }
+  n_obs_survey <- nrow(surveydata)
   
   ##### check whether censusdata is specified correctly and try to correct
-  if (missing(censusdata))
-    stop("Data frame with the censusdata is missing")
-  if (!is.data.table(censusdata)) {
-    censusdata <- try(as.data.table(censusdata), silent = T)
+  if (missing(census)){
+    stop("Input census is missing")
+  }
+  if (is.data.table(census)) {
+    # pass-by-reference behaviour of data.table would alter input outside the
+    # scope of this function. 
+    censusdata <- copy(census) 
+  } else {
+    censusdata <- try(as.data.table(census), silent = T)
     if (!is.data.table(censusdata)) {
       stop(
         "census data should be provided as data.table or something similar
@@ -213,12 +228,18 @@ ellsae_big <- function(model,
         your input into a data.table"
       )
     }
-  }
+    }
   # all the variables of the model have to be in the data as well
   if (!all(explanatories %in%  names(censusdata))) {
     stop("the model you provided specifies variables
          that are not included in the censusdata")
   }
+  # remove NAs
+  if (any(is.na(censusdata[, c(..explanatories)]))) {
+    censusdata <- censusdata[complete.cases(censusdata[, c(..explanatories)]), ]
+    warning("your censusdata had missing values. Affected rows were removed.")
+  }
+  n_obs_census <- nrow(censusdata)
   
   ##### check whether the locations are specified correctly and try to correct
   if (missing(location_survey)) {
@@ -255,7 +276,7 @@ ellsae_big <- function(model,
     }
   }
   
-  # if a seed is specified, save the internal seed and restore it later
+  #### if a seed is specified, save the internal seed and restore it later
   if (!missing(seed)) {
     runif(1) # make sure R seed is set internally
     previousseed <- .Random.seed
@@ -266,8 +287,7 @@ ellsae_big <- function(model,
   } else {
     seed <- as.numeric(Sys.time()) # seed needed for C++
   }
-  
-  ##### check whether seed is now correctly specified
+  # check whether seed is now correctly specified
   if (length(seed) != 1) {
     stop("If you want to set a seed it has to be provided as single integer")
   }
@@ -284,8 +304,12 @@ ellsae_big <- function(model,
       message("you have transformed y, but not provided a funtion transfy_inv
               for backtransformation")
     } 
+    #surveydata[, ..response := transfy(..response)]
     set(surveydata, j = response, value = transfy(surveydata[[response]]))
-  }
+    if (any(is.na(surveydata[,..response]))){
+      warning("transfy has produced NAs")
+    }
+    }
   
   
   #### check whether output was correctly specified
@@ -296,32 +320,19 @@ ellsae_big <- function(model,
     )
   }
   
-  ##### check whether number of cores was correctly specified
-  if (length(cores_c) != 1) {
-    stop("cores_c has to be either 'auto' or a single integer")
+  ##### check whether cores was correctly specified
+  if (length(cores) != 1) {
+    stop("cores has to be either 'auto' or a single integer")
   }
-  if (cores_c == "auto"){
-    cores_c <- 999L
+  if (cores == "auto"){
+    cores <- 999L
   }
-  if (!is.integer(cores_c)) {
-    cores_c <- try(as.integer(cores_c), silent = T) 
-    if (!is.integer(cores_c)) {
-      stop("cores_c has to be either 'auto' or a single integer")
+  if (!is.integer(cores)) {
+    cores <- try(as.integer(cores), silent = T) 
+    if (!is.integer(cores)) {
+      stop("cores has to be either 'auto' or a single integer")
     }
   }
-  if (length(cores_r) != 1) {
-    stop("cores_r has to be either 'auto' or a single integer")
-  }
-  if (cores_r == "auto"){
-    cores_r <- bigstatsr::nb_cores()
-  }
-  if (!is.integer(cores_r)) {
-    cores_r <- try(as.integer(cores_r), silent = T) 
-    if (!is.integer(cores_r)) {
-      stop("cores_r has to be either 'auto' or a single integer")
-    }
-  }
-  
   
   # Trys to correct the quantiles if specified incorrectly
   quantiles <- try(as.numeric(quantiles))
@@ -346,20 +357,6 @@ ellsae_big <- function(model,
   
   
   
-  # check for NA and remove 
-  if (any(is.na(surveydata[, c(..response, ..explanatories)]))) {
-    surveydata <- surveydata[complete.cases(surveydata[, c(..response, ..explanatories)]), ]
-    warning("your surveydata had missing values. Affected rows were removed.")
-  }
-  if (any(is.na(censusdata[, c(..explanatories)]))) {
-    censusdata <- censusdata[complete.cases(censusdata[, c(..explanatories)]), ]
-    warning("your censusdata had missing values. Affected rows were removed.")
-  }
-  
-  n_obs_survey <- nrow(surveydata)
-  n_obs_census <- nrow(censusdata)
-  
-  
   ######## clustermeans #######
   
   #### check if input for clustermeans is valid and reformat
@@ -376,7 +373,7 @@ ellsae_big <- function(model,
           for location_survey suffices."
         )
       }
-    }
+      }
     
     # checks if all the locations in the survey are equal those in the census.
     if (!all(unique(surveydata[, ..location_survey]) %in%
@@ -420,7 +417,7 @@ ellsae_big <- function(model,
         b) a character vector with your variables, e.g. c('age', 'sex')
         c) a \"\'.\'\" as string, indicating that you want to include the
         mean of all the variables in your model"
-      )
+        )
     }
     if (!all(clustermeans %in%  names(censusdata))) {
       stop(
@@ -465,7 +462,7 @@ ellsae_big <- function(model,
                                    sep = " + ")
     model <- as.formula(paste(model_left_hand_side,
                               model_right_hand_side, sep = " ~ "))
-  }
+    }
   
   
   # -------------------------- inference survey ------------------------------ #

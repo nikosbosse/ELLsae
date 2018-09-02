@@ -34,17 +34,17 @@ location_survey = "a"
 
 test_that("If there are NA in the explanatories they are correctly omitted", {
   expect_warning(nrow(ellsae(model = y ~ a + b, clustermeans = "b",
-                           surveydata = df.survey.NAexpl, censusdata = df.census,
+                           survey = df.survey.NAexpl, census = df.census,
                            location_survey = "a", seed = 12345,
                            output = "all", n_boot = 50L)$survey), 
-                 "your surveydata had missing values. Affected rows were removed.")
+                 "your survey had missing values. Affected rows were removed.")
 })
 
 test_that("If there are NA in the location_census variable and clustermeans
           is used, then an error is thrown", {
   expect_error(ellsae(model = y ~ b, clustermeans = "b",
-                      surveydata = df.survey, 
-                      censusdata = df.census.NAloc,
+                      survey = df.survey, 
+                      census = df.census.NAloc,
                       location_survey = "a", seed = 12345,
                       output = "all", n_boot = 50L))
   

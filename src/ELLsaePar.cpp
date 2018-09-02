@@ -52,7 +52,7 @@ SEXP InfCensCpp(const int n_bootstrap,
 #endif
   
   
-#pragma omp for schedule(dynamic)
+#pragma omp for 
   for (int i=0; i<n_obs_censusdata; ++i)
     for (int j=0; j<n_bootstrap; j++)
       result(i,j) = X.row(i)* beta_sample.col(j) + locationeffects[distrloc(lgen)] + residuals[distrres(lgen)];
@@ -159,7 +159,7 @@ void InfCensBigCpp(Environment fbm, const int n_bootstrap,
   dqrng::xoshiro256plus lgen(gen);      // make thread local copy of rng
   lgen.jump(omp_get_thread_num() + 1);  // advance rng by 1 ... ncores jumps
   
-#pragma omp for schedule(dynamic)
+#pragma omp for 
   for (int i=0; i<n_obs_censusdata; ++i)
     for (int j=0; j<n_bootstrap; j++)
       macc(j,i) = X.row(i) * beta_sample.col(j) + locationeffects[distrloc(lgen)] + residuals[distrres(lgen)];

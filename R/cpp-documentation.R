@@ -1,3 +1,3 @@
-#' @useDynLib ELLsae
-#' @importFrom Rcpp evalCpp
+#' @useDynLib ELLsae, .registration = TRUE
+#' @importFrom Rcpp evalCpp 
 NULL

@@ -24,7 +24,11 @@ be imputed}
 set that contains information about the cluster (= location) of an
 observation}
 
+<<<<<<< HEAD
 \item{n_boot}{integer indicating the size of the bootstrap sample}
+=======
+\item{n_boot}{integer with size of bootstrap sample}
+>>>>>>> 9c90aac2ee092bca3e8bb83a0a85f333358f1aa5
 
 \item{seed}{integer, seed can be set to obtain reproducible results}
 
@@ -41,6 +45,7 @@ or a vector with one or more of the following elements: c("summary",
 
 \item{cores_c}{either a string, "auto", or an integer value indicating the
 number of cores to be used for the estimation in C++.}
+<<<<<<< HEAD
 
 \item{cores_r}{either a string, "auto", or an integer value indicating the
 number of cores to be used for the estimation in R.}
@@ -48,6 +53,15 @@ number of cores to be used for the estimation in R.}
 \item{quantiles}{vector of requested quantiles for the \code{summaryboot}
 output defined as decimals between 0 and 1.}
 
+=======
+
+\item{cores_r}{either a string, "auto", or an integer value indicating the
+number of cores to be used for the estimation in R.}
+
+\item{quantiles}{vector of requested quantiles for the \code{summaryboot}
+output as decimals between 0 and 1.}
+
+>>>>>>> 9c90aac2ee092bca3e8bb83a0a85f333358f1aa5
 \item{clustermeans}{character vector with names of variables present in both
 data sets. The mean of those variables in the census will be computed by
 location and added to the survey data set before estimation of the linear
@@ -55,7 +69,11 @@ model. This may enhance precision of your estimates}
 
 \item{location_census}{string with the name of the variable in the survey data
 set that contains information about the cluster (= location) of an
+<<<<<<< HEAD
 observation. Only needed if \code{clustermeans} are computed.}
+=======
+observation. Only needed if \code{clustermeans} shall be computed.}
+>>>>>>> 9c90aac2ee092bca3e8bb83a0a85f333358f1aa5
 
 \item{save_boot}{logical value. TRUE saves the bootstrap sample as
 BootstrapSampleELLsae-DATE.csv in your current working direktory.}
@@ -89,11 +107,17 @@ locations. These new explanatory variables are also used for the estimation of
 the linear model. Rows with NA's are omitted from the computation.
 
 The user may choose to transform the response variable using
-a function, \code{transfy} previously to estimating the model.
-This function will be directly applied to the vector of the response
-variable, i.e. \code{transfy(response)}. In principle this could also be
-achieved by altering the specified model, but using \code{transfy} and
-\code{transfy_inv} is the recommended usage. 
+a function, \code{transfy} previously to estimating the model. This function
+will be directly applied to the entire vector of the response variable, i.e.
+\code{transfy(response)}. This means your function needs to be able to take a
+vector as input. For transformations like \code{log}, \code{exp}, \code{sqrt}
+this will just give you an element-wise transformation. For more complex
+transformation, you may want to use \code{\link{sapply}} inside your function,
+to ensure element-wise transformation. This also applies to
+\code{transfy_inv}, and \code{welfare.function} which need to be able to take
+a matrix as input. In many cases a transformation like \code{transfy} could
+also be achieved by altering the specified model appropriately, but using
+\code{transfy} and \code{transfy_inv} is the recommended usage.
 
 From the regression, location
 effects are calculated as the mean by location of the regression residuals.
@@ -103,7 +127,7 @@ variables are generated using three sources of randomness. The betas obtained
 from \code{lm()} are replaced by draws from a multivariate normal
 distribution. In addition random location effects and residuals are drawn with
 replacement. Internally the sample is a matrix, \code{bootstrap}, with
-the rows corresponding to bootstrap samples for one individual observation in
+the columns corresponding to bootstrap samples for one individual observation in
 the census data set. 
 
 If \code{transfy_inv} was specified, the bootstrap sample
@@ -113,7 +137,9 @@ of bootstrap samples, i.e. \code{transfy_inv(bootstrap)}.
 If a welfare
 function was specified it will be used to transform the bootstrap sample. It
 will be diretly applied to the matrix of bootstrap samples, i.e.
-\code{welfare.function(bootstrap)}.
+\code{welfare.function(bootstrap)}. Differing from \code{\link{ellsae}},
+bootstrap samples that belong to one observation in the internally stored
+matrix are arranged column-wise.
 
 \code{cores_c} specifies the number of cores to use for the calculation. As
 parallelization is done in C++ and incurs little overhead this should in most
@@ -121,6 +147,7 @@ cases be left to "auto".
 
 \code{cores_r} specifies the number of cores to used for calculations in R.
 The method of parallelization is the one implemented in the pacakge
+<<<<<<< HEAD
 \code{\link[foreach]{foreach}}. Parallelization does come with a signifacnt 
 overhead,
 the default is therefore 1. "auto" invokes 
@@ -130,6 +157,15 @@ and creates clusters according to the number of physical CPUs available.
 To obtain reproducicble results, a \code{seed} can be specified. Simply 
 running \code{set.seed()} in R does not work. 
 Beware, providing a seed will \strong{not} permanently alter the seed in R.
+=======
+\code{\link{[foreach]}}. Parallelization does come with a signifacnt overhead,
+the default is therefore 1. "auto" invokes \code{\link{[bigstatsr]nb_cores()}}
+and creates clusters according to the number of physical CPUs available.
+
+To obtain reproducicble results, seed must be specified. Simply running
+\code{set.seed()} in R does not work. Providing a seed will not permanently
+alter the seed in R.
+>>>>>>> 9c90aac2ee092bca3e8bb83a0a85f333358f1aa5
 }
 \examples{
 # Generate a sample survey and census data from the provided brazil data set
@@ -141,6 +177,7 @@ census <- brazil[-helper,]
 model.example <- hh_inc ~ geo2_br + age + sex + computer + trash
 
 ELLsae::ellsae_big(model = model.example,
+<<<<<<< HEAD
                    survey = survey,
                    census = census,
                    location_survey = "geo2_br",
@@ -155,6 +192,22 @@ ELLsae::ellsae_big(model = model.example,
                    clustermeans = "age",
                    location_census = "geo2_br",
                    save_boot = F)
+=======
+               survey = survey,
+               census = census,
+               location_survey = "geo2_br",
+               n_boot = 250L,
+               seed = 1234,
+               transfy = log,
+               transfy_inv = exp,
+               output = "all",
+               cores_c = "auto",
+               cores_r = 1,
+               quantiles = c(0, 0.25, 0.5, 0.75, 1),
+               clustermeans = "age",
+               location_census = "geo2_br",
+               save_boot = FALSE)
+>>>>>>> 9c90aac2ee092bca3e8bb83a0a85f333358f1aa5
 }
 \references{
 Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003).

@@ -4,7 +4,7 @@
 #'  used to impute a missing variable from a smaller survey dataset into a
 #'  census. The imputation is based on a linear model and bootstrap samples
 #'
-#'@param model a model that describes the relationship betwenn the response and
+#'@param model a model that describes the relationship between the response and
 #'  the explanatory variables. Input must be a linear model that can be
 #'  processed by \code{lm()}
 #'@param survey data set with the response variable of interest included.
@@ -14,9 +14,9 @@
 #'@param location_survey string with the name of the variable in the survey data
 #'  set that contains information about the cluster (= location) of an
 #'  observation
-#'@param n_boot integer with size of bootstrap sample
+#'@param n_boot integer indicating the size of the bootstrap sample
 #'@param seed integer, seed can be set to obtain reproducible results
-#'@param welfare.function function that transforms the bootstraped variable of
+#'@param welfare.function function that transforms the bootstrapped variable of
 #'interested to obtain some welfare estimate
 #'@param transfy function to transform the response y in the model
 #'@param transfy_inv inverse function of \code{transfy} for backtransformation
@@ -26,18 +26,16 @@
 #'@param cores either a string, "auto", or an integer value indicating the
 #'  number of cores to be used for the estimation.
 #'@param quantiles vector of requested quantiles for the \code{summaryboot}
-#'  output as decimals between 0 and 1.
+#'  output defined as decimals between 0 and 1.
 #'@param clustermeans character vector with names of variables present in both
 #'  data sets. The mean of those variables in the census will be computed by
 #'  location and added to the survey data set before estimation of the linear
 #'  model. This may enhance precision of your estimates
 #'@param location_census string with the name of the variable in the survey data
 #'  set that contains information about the cluster (= location) of an
-#'  observation. Only needed if \code{clustermeans} shall be computed.
+#'  observation. Only needed if \code{clustermeans} are computed.
 #'@param save_boot logical value. TRUE saves the bootstrap sample as
 #'  BootstrapSampleELLsae-DATE.csv in your current working direktory.
-#'
-
 #'
 #'@details The function takes the the surveydata and uses the argument
 #'\code{model} to estimate a linear model of the type \code{lm()}. In case the
@@ -77,9 +75,9 @@
 #'parallelization is done in C++ and incurs little overhead this should in most
 #'cases be left to "auto".
 #'
-#'To obtain reproducicble results, seed must be specified. Simply running
-#'\code{set.seed()} in R does not work. Providing a seed will not permanently
-#'alter the seed in R.
+#'To obtain reproducicble results, a \code{seed} can be specified. Simply 
+#'running \code{set.seed()} in R does not work. 
+#'Beware, providing a seed will \strong{not} permanently alter the seed in R.
 #'
 #'@return \code{ellsae} returns a list. By default, this list included a matrix
 #'with basic summary statistics as specified in \code{quantiles}, a vector with
@@ -90,8 +88,10 @@
 #'effects and clustermeans added.
 #'
 #'
-#'@seealso Other small area estimation methods can also be found in the package
-#'  \code{sae}.
+#'@seealso If issues with RAM capacity occur one can also use 
+#'\code{\link[ELLsae:ellsae]{ellsae}} instead.Other small area estimation 
+#'methods can also be found in the package
+#'\code{\link[sae:sae-package]{sae-package}}.
 #'@keywords SAE, imputation
 #'@references Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003).
 #'\emph{Micro-Level Estimation of Poverty and Inequality}. In: Econometrica

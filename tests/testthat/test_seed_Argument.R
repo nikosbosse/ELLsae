@@ -20,7 +20,8 @@ ellsae(model = y ~ a + b, clustermeans = "b",
 random_control[i] <- runif(1)
 }
 
-test_that("setting a seed actually leads to the same result every time", {
+test_that("setting a seed actually leads to the same result 
+          every time (ellsae)", {
   expect_equal(ellsae(model = y ~ a + b, clustermeans = "b",
                       survey = df.survey, census = df.census,
                       location_survey = "a", seed = 12345,
@@ -31,6 +32,34 @@ test_that("setting a seed actually leads to the same result every time", {
                       output = "all", n_boot = 50L)$yboot_est)
 })
 
-test_that("The seed is actually randomized again after the function is done", {
+test_that("The seed is actually randomized again after the function is done 
+          (ellsae)", {
   expect_gte(length(unique(random_control)), 2)
 })
+
+
+test_that("setting a seed actually leads to the same result 
+          every time (ellsae_big)", {
+            expect_equal(ellsae_big(model = y ~ a + b, clustermeans = "b",
+                                survey = df.survey, census = df.census,
+                                location_survey = "a", seed = 12345,
+                                output = "all", n_boot = 50L)$yboot_est, 
+                         ellsae_big(model = y ~ a + b, clustermeans = "b",
+                                survey = df.survey, census = df.census,
+                                location_survey = "a", seed = 12345,
+                                output = "all", n_boot = 50L)$yboot_est)
+          })
+
+random_control_big <- c()
+for (i in 1:7) {
+  ellsae_big(model = y ~ a + b, clustermeans = "b",
+         survey = df.survey, census = df.census,
+         location_survey = "a", seed = 12345,
+         output = "all", n_boot = 50L)$yboot_est
+  random_control_big[i] <- runif(1)
+}
+
+test_that("The seed is actually randomized again after the function is done 
+          (ellsae_big)", {
+            expect_gte(length(unique(random_control_big)), 2)
+          })

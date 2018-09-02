@@ -16,7 +16,7 @@ census <-  data.frame(a = c(1,2,6,7,5,1,39,6),
 model <- a ~ b + c
 location_survey <- "c"
 
-test_that("the function works", {
+test_that("the function works (ellsae)", {
   expect_equal(length(ellsae(model, survey , census, 
                              location_survey, n_boot = 5, 
                              welfare.function = identity)$yboot_est),
@@ -24,9 +24,17 @@ test_that("the function works", {
 
 })
 
+test_that("the function works (ellsae_big)", {
+  expect_equal(length(ellsae_big(model, survey , census, 
+                             location_survey, n_boot = 5, 
+                             welfare.function = identity)$yboot_est),
+               8)
+  
+})
+
 # -------------- welfare functions ------------------ #
 
-test_that("different welfare functions can be introduced", {
+test_that("different welfare functions can be introduced (ellsae)", {
   expect_equal(length(ellsae(model, survey , census, location_survey,
                              n_boot = 5, seed = 1234, 
                              welfare.function = function(x){2*x})$yboot_est),8)
@@ -35,13 +43,20 @@ test_that("different welfare functions can be introduced", {
                              welfare.function = function(x){log(x^2 + 2)})$yboot_est),8)
 })
 
-
+test_that("different welfare functions can be introduced (ellsae_big)", {
+  expect_equal(length(ellsae_big(model, survey , census, location_survey,
+                             n_boot = 5, seed = 1234, 
+                             welfare.function = function(x){2*x})$yboot_est),8)
+  expect_equal(length(ellsae_big(model, survey , census, location_survey, 
+                             n_boot = 5, 
+                             welfare.function = function(x){log(x^2 + 2)})$yboot_est),8)
+})
 
 
 # -------------- inputs ------------------ #
 
 context("Testing whether the function handles inputs 
-        the way it is supposed to be")
+        the way it is supposed to be (ellsae)")
 
 test_that("the function handles inputs for survey correctly", {
   expect_equal(length(ellsae(model, as.matrix(survey) , census, 
@@ -53,7 +68,7 @@ test_that("the function handles inputs for survey correctly", {
                "Input survey is missing")
 })
 
-test_that("the function handles inputs for census correctly", {
+test_that("the function handles inputs for census correctly (ellsae)", {
   expect_equal(length(ellsae(model, survey, 
                              as.matrix(census), location_survey, n_boot = 5, 
                              welfare.function = identity)$yboot_est),
@@ -63,7 +78,7 @@ test_that("the function handles inputs for census correctly", {
                "Input census is missing")
 })
 
-test_that("the function handles inputs for locations correctly", {
+test_that("the function handles inputs for locations correctly (ellsae)", {
   # input: string = variable name
   expect_equal(length(ellsae(model, survey , census, 
                              location_survey = "c",
@@ -81,7 +96,45 @@ test_that("the function handles inputs for locations correctly", {
 })
 
 
+context("Testing whether the function handles inputs 
+        the way it is supposed to be (ellsae_big)")
 
+test_that("the function handles inputs for survey correctly", {
+  expect_equal(length(ellsae_big(model, as.matrix(survey) , census, 
+                             location_survey, n_boot = 5, 
+                             welfare.function = identity)$yboot_est),
+               8)
+  expect_error(length(ellsae_big(model = model, census = census,
+                             location_survey = location_survey, n_boot = 5)),
+               "Input survey is missing")
+})
+
+test_that("the function handles inputs for census correctly (ellsae_big)", {
+  expect_equal(length(ellsae_big(model, survey, 
+                             as.matrix(census), location_survey, n_boot = 5, 
+                             welfare.function = identity)$yboot_est),
+               8)
+  expect_error(length(ellsae_big(model = model, survey = survey,
+                             location_survey = location_survey, n_boot = 5)),
+               "Input census is missing")
+})
+
+test_that("the function handles inputs for locations correctly (ellsae_big)", {
+  # input: string = variable name
+  expect_equal(length(ellsae_big(model, survey , census, 
+                             location_survey = "c",
+                             n_boot = 5)$yboot_est),8)
+  # input: location vector missing
+  expect_error(length(ellsae_big(model, survey , census, n_boot = 5)))
+  #"you have to provide a string with the variable indicating       
+  # location in the survey data set"
+  # input: string = not a variable name
+  expect_error(length(ellsae_big(model, survey , census, 
+                             location_survey = "d",
+                             n_boot = 5)))
+  #"String that was specified as variable name for the location 
+  # is not the name of one of the variables in the survey data set."
+})
 # Tests für mResponse:
 # er meckert, wenn er kein census_location als String bekommt, oder die Variablennamen gleich sind
 # er meckert, wenn nicht alle Variablen in mResponse auch in Census enthalten sind

@@ -4,31 +4,31 @@
 \alias{ellsae}
 \title{ellsae}
 \usage{
-ellsae(model, surveydata, censusdata, location_survey, n_boot = 250L,
-  seed, welfare.function, transfy, transfy_inv, output = "default",
-  num_cores = "auto", quantiles = c(0, 0.25, 0.5, 0.75, 1),
-  clustermeans, location_census, save_boot = F)
+ellsae(model, survey, census, location_survey, n_boot = 250L, seed,
+  welfare.function, transfy, transfy_inv, output = "default",
+  cores = "auto", quantiles = c(0, 0.25, 0.5, 0.75, 1), clustermeans,
+  location_census, save_boot = F)
 }
 \arguments{
-\item{model}{a model that describes the relationship betwenn the response and
+\item{model}{a model that describes the relationship between the response and
 the explanatory variables. Input must be a linear model that can be
 processed by \code{lm()}}
 
-\item{surveydata}{data set with the response variable of interest included.
+\item{survey}{data set with the response variable of interest included.
 Will be used to estimate the linear model}
 
-\item{censusdata}{dataset where the variable of interest is missing and shall
+\item{census}{dataset where the variable of interest is missing and shall
 be imputed}
 
 \item{location_survey}{string with the name of the variable in the survey data
 set that contains information about the cluster (= location) of an
 observation}
 
-\item{n_boot}{integer with size of bootstrap sample}
+\item{n_boot}{integer indicating the size of the bootstrap sample}
 
 \item{seed}{integer, seed can be set to obtain reproducible results}
 
-\item{welfare.function}{function that transforms the bootstraped variable of
+\item{welfare.function}{function that transforms the bootstrapped variable of
 interested to obtain some welfare estimate}
 
 \item{transfy}{function to transform the response y in the model}
@@ -39,11 +39,11 @@ interested to obtain some welfare estimate}
 or a vector with one or more of the following elements: c("summary",
 "yboot", "model_fit", "bootsample", "survey", "census")}
 
-\item{num_cores}{either a string, "auto", or an integer value indicating the
+\item{cores}{either a string, "auto", or an integer value indicating the
 number of cores to be used for the estimation.}
 
 \item{quantiles}{vector of requested quantiles for the \code{summaryboot}
-output as decimals between 0 and 1.}
+output defined as decimals between 0 and 1.}
 
 \item{clustermeans}{character vector with names of variables present in both
 data sets. The mean of those variables in the census will be computed by
@@ -52,7 +52,7 @@ model. This may enhance precision of your estimates}
 
 \item{location_census}{string with the name of the variable in the survey data
 set that contains information about the cluster (= location) of an
-observation. Only needed if \code{clustermeans} shall be computed.}
+observation. Only needed if \code{clustermeans} are computed.}
 
 \item{save_boot}{logical value. TRUE saves the bootstrap sample as
 BootstrapSampleELLsae-DATE.csv in your current working direktory.}
@@ -107,13 +107,13 @@ function was specified it will be used to transform the bootstrap sample. It
 will be diretly applied to the matrix of bootstrap samples, i.e.
 \code{welfare.function(bootstrap)}.
 
-\code{num_cores} specifies the number of cores to use for the calculation. As
+\code{cores} specifies the number of cores to use for the calculation. As
 parallelization is done in C++ and incurs little overhead this should in most
 cases be left to "auto".
 
-To obtain reproducicble results, seed must be specified. Simply running
-\code{set.seed()} in R does not work. Providing a seed will not permanently
-alter the seed in R.
+To obtain reproducicble results, a \code{seed} can be specified. Simply 
+running \code{set.seed()} in R does not work. 
+Beware, providing a seed will \strong{not} permanently alter the seed in R.
 }
 \examples{
 # Generate a sample survey and census data from the provided brazil data set
@@ -125,15 +125,15 @@ census <- brazil[-helper,]
 model.example <- hh_inc ~ geo2_br + age + sex + computer + trash
 
 ELLsae::ellsae(model = model.example,
-               surveydata = survey,
-               censusdata = census,
+               survey = survey,
+               census = census,
                location_survey = "geo2_br",
                n_boot = 250L,
                seed = 1234,
                transfy = log,
                transfy_inv = exp,
                output = "all",
-               num_cores = "auto",
+               cores = "auto",
                quantiles = c(0, 0.25, 0.5, 0.75, 1),
                clustermeans = "age",
                location_census = "geo2_br",
@@ -150,7 +150,7 @@ of small area estimation methods for poverty mapping}. In: 17 (Mar. 2016),
 }
 \seealso{
 Other small area estimation methods can also be found in the package
- \code{sae}.
+ \code{\link[sae:sae-package]{sae-package}}.
 }
 \keyword{SAE,}
 \keyword{imputation}

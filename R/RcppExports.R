@@ -2,18 +2,18 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 .InfCensCpp <- function(n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, userseed, ncores) {
-    .Call('_ELLsae_InfCensCpp', PACKAGE = 'ELLsae', n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, userseed, ncores)
+    .Call(`_ELLsae_InfCensCpp`, n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, userseed, ncores)
 }
 
 .summaryParC <- function(x, quantiles, nrow, ncol, ncores) {
-    .Call('_ELLsae_summaryParC', PACKAGE = 'ELLsae', x, quantiles, nrow, ncol, ncores)
+    .Call(`_ELLsae_summaryParC`, x, quantiles, nrow, ncol, ncores)
 }
 
 .InfCensBigCpp <- function(fbm, n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, userseed, ncores) {
-    invisible(.Call('_ELLsae_InfCensBigCpp', PACKAGE = 'ELLsae', fbm, n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, userseed, ncores))
+    invisible(.Call(`_ELLsae_InfCensBigCpp`, fbm, n_bootstrap, n_obs_censusdata, locationeffects, residuals, X, beta_sample, userseed, ncores))
 }
 
 .summaryBigParCt <- function(fbm, quantiles, nrow, ncol, ncores) {
-    .Call('_ELLsae_summaryBigParCt', PACKAGE = 'ELLsae', fbm, quantiles, nrow, ncol, ncores)
+    .Call(`_ELLsae_summaryBigParCt`, fbm, quantiles, nrow, ncol, ncores)
 }
 

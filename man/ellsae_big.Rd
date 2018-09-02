@@ -87,11 +87,17 @@ locations. These new explanatory variables are also used for the estimation of
 the linear model. Rows with NA's are omitted from the computation.
 
 The user may choose to transform the response variable using
-a function, \code{transfy} previously to estimating the model.
-This function will be directly applied to the vector of the response
-variable, i.e. \code{transfy(response)}. In principle this could also be
-achieved by altering the specified model, but using \code{transfy} and
-\code{transfy_inv} is the recommended usage. 
+a function, \code{transfy} previously to estimating the model. This function
+will be directly applied to the entire vector of the response variable, i.e.
+\code{transfy(response)}. This means your function needs to be able to take a
+vector as input. For transformations like \code{log}, \code{exp}, \code{sqrt}
+this will just give you an element-wise transformation. For more complex
+transformation, you may want to use \code{\link{sapply}} inside your function,
+to ensure element-wise transformation. This also applies to
+\code{transfy_inv}, and \code{welfare.function} which need to be able to take
+a matrix as input. In many cases a transformation like \code{transfy} could
+also be achieved by altering the specified model appropriately, but using
+\code{transfy} and \code{transfy_inv} is the recommended usage.
 
 From the regression, location
 effects are calculated as the mean by location of the regression residuals.
@@ -101,7 +107,7 @@ variables are generated using three sources of randomness. The betas obtained
 from \code{lm()} are replaced by draws from a multivariate normal
 distribution. In addition random location effects and residuals are drawn with
 replacement. Internally the sample is a matrix, \code{bootstrap}, with
-the rows corresponding to bootstrap samples for one individual observation in
+the columns corresponding to bootstrap samples for one individual observation in
 the census data set. 
 
 If \code{transfy_inv} was specified, the bootstrap sample
@@ -111,7 +117,9 @@ of bootstrap samples, i.e. \code{transfy_inv(bootstrap)}.
 If a welfare
 function was specified it will be used to transform the bootstrap sample. It
 will be diretly applied to the matrix of bootstrap samples, i.e.
-\code{welfare.function(bootstrap)}.
+\code{welfare.function(bootstrap)}. Differing from \code{\link{ellsae}},
+bootstrap samples that belong to one observation in the internally stored
+matrix are arranged column-wise.
 
 \code{cores_c} specifies the number of cores to use for the calculation. As
 parallelization is done in C++ and incurs little overhead this should in most

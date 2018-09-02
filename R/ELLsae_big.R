@@ -98,9 +98,9 @@
 #'\code{\link[bigstatsr:nb_cores]{nb_cores}}
 #'and creates clusters according to the number of physical CPUs available.
 #'
-#'To obtain reproducicble results, a \code{seed} can be specified. Simply 
-#'running \code{set.seed()} in R does not work. 
-#'Beware, providing a seed will \strong{not} permanently alter the seed in R.
+#'To obtain reproducicble results, a \code{seed} can be specified. Simply
+#'running \code{set.seed()} in R does not work. providing a seed will not
+#'permanently alter the seed in R.
 #'
 #'@return \code{ellsae_big} returns a list. By default, this list included a 
 #'matrix

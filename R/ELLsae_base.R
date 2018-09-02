@@ -83,9 +83,9 @@
 #'parallelization is done in C++ and incurs little overhead this should in most
 #'cases be left to "auto".
 #'
-#'To obtain reproducicble results, a \code{seed} can be specified. Simply 
-#'running \code{set.seed()} in R does not work. 
-#'Beware, providing a seed will \strong{not} permanently alter the seed in R.
+#'To obtain reproducicble results, a \code{seed} can be specified. Simply
+#'running \code{set.seed()} in R does not work. providing a seed will not
+#'permanently alter the seed in R.
 #'
 #'@return \code{ellsae} returns a list. By default, this list included a matrix
 #'with basic summary statistics as specified in \code{quantiles}, a vector with

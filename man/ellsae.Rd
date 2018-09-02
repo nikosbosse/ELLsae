@@ -119,9 +119,9 @@ observation are arranged row-wise.
 parallelization is done in C++ and incurs little overhead this should in most
 cases be left to "auto".
 
-To obtain reproducicble results, a \code{seed} can be specified. Simply 
-running \code{set.seed()} in R does not work. 
-Beware, providing a seed will \strong{not} permanently alter the seed in R.
+To obtain reproducicble results, a \code{seed} can be specified. Simply
+running \code{set.seed()} in R does not work. providing a seed will not
+permanently alter the seed in R.
 }
 \examples{
 # Generate a sample survey and census data from the provided brazil data set
@@ -157,8 +157,10 @@ of small area estimation methods for poverty mapping}. In: 17 (Mar. 2016),
 41-66 and 156 and 158.
 }
 \seealso{
-Other small area estimation methods can also be found in the package
- \code{\link[sae:sae-package]{sae-package}}.
+If issues with RAM capacity occur one can also use 
+\code{\link[ELLsae:ellsae]{ellsae}} instead.Other small area estimation 
+methods can also be found in the package
+\code{\link[sae:sae-package]{sae-package}}.
 }
 \keyword{SAE,}
 \keyword{imputation}

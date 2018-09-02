@@ -26,7 +26,7 @@ test_that("Only meaningful quantiles are computed (ellsea)", {
                            location_survey, n_boot = 5, 
                            welfare.function = identity,
                            quantiles = c(5, 0.5, -10, -0.7, 0.2, 1)
-  )$summary_boot), "quantiles < 0 and >1 are automatically omitted (ellsea)")
+  )$summary_boot), "quantiles < 0 and >1 are automatically omitted")
   
   expect_warning(ellsae(model, survey , census, 
                         location_survey, n_boot = 5, 
@@ -48,7 +48,7 @@ test_that("Only meaningful quantiles are computed (ellsea_big)", {
                              location_survey, n_boot = 5, 
                              welfare.function = identity,
                              quantiles = c(5, 0.5, -10, -0.7, 0.2, 1)
-  )$summary_boot), "quantiles < 0 and >1 are automatically omitted (ellsea_big)")
+  )$summary_boot), "quantiles < 0 and >1 are automatically omitted")
   
   expect_warning(ellsae_big(model, survey , census, 
                         location_survey, n_boot = 5, 

@@ -107,9 +107,10 @@
 #'with basic summary statistics as specified in \code{quantiles}, a vector with
 #'the means of the bootstrap samples for every observation, and the
 #'\code{lm}-object obtained from the linear model estimation. In addition, the
-#'user can request the full matrix of bootstrap samples, and an updated
+#'user can request the full file-based-matrix of bootstrap samples, and an updated
 #'data.table of the survey and census data set with residuals and location
-#'effects and clustermeans added.
+#'effects and clustermeans added. The FBM can be subsetted with [i,j] just like
+#'a regular matrix.
 #'
 #'@seealso Other small area estimation methods can also be found in the package
 #'@keywords SAE, imputation

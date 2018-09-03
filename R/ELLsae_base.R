@@ -7,9 +7,9 @@
 #'@param model a model that describes the relationship between the response and
 #'  the explanatory variables. Input must be a linear model that can be
 #'  processed by \code{lm()}
-#'@param survey data set with the response variable of interest included.
-#'  Will be used to estimate the linear model
-#'@param census dataset where the variable of interest is missing and shall
+#'@param survey data.table with the response variable of interest included. Will
+#'  be used to estimate the linear model. Input will be coerced to a data.table
+#'@param census data.table where the variable of interest is missing and shall
 #'  be imputed
 #'@param location_survey string with the name of the variable in the survey data
 #'  set that contains information about the cluster (= location) of an
@@ -17,9 +17,9 @@
 #'@param n_boot integer indicating the size of the bootstrap sample
 #'@param seed integer, seed can be set to obtain reproducible results
 #'@param welfare.function function that transforms the bootstrapped variable of
-#'interested to obtain some welfare estimate
+#'  interested to obtain some welfare estimate
 #'@param transfy function to transform the response y in the model
-#'@param transfy_inv inverse function of \code{transfy} for backtransformation
+#'@param transfy_inv inverse function of \code{transfy} for back-transformation
 #'@param output character string or character vector. Either "default", "all",
 #'  or a vector with one or more of the following elements: c("summary",
 #'  "yboot", "model_fit", "bootsample", "survey", "census")
@@ -30,75 +30,74 @@
 #'@param clustermeans character vector with names of variables present in both
 #'  data sets. The mean of those variables in the census will be computed by
 #'  location and added to the survey data set before estimation of the linear
-#'  model. This may enhance precision of your estimates
+#'  model. This may enhance precision of the estimates
 #'@param location_census string with the name of the variable in the survey data
 #'  set that contains information about the cluster (= location) of an
 #'  observation. Only needed if \code{clustermeans} are computed.
 #'@param save_boot logical value. TRUE saves the bootstrap sample as
-#'  BootstrapSampleELLsae-DATE.csv in your current working direktory.
+#'  BootstrapSampleELLsae-DATE.csv in the current working direktory.
 #'
-#'@details The function takes the the surveydata and uses the argument
-#'\code{model} to estimate a linear model of the type \code{lm()}. In case the
-#'argument \code{clustermeans} is specified, means from the census data for the
-#'given variables are calculated and merged with the survey data by cluster
-#'locations. These new explanatory variables are also used for the estimation of
-#'the linear model. Rows with NA's are omitted from the computation.
+#'@details The function takes the survey data set and uses the argument
+#'  \code{model} to estimate a linear model of the type \code{lm()}. In case the
+#'  argument \code{clustermeans} is specified, means from the census data for
+#'  the given variables are calculated and merged with the survey data by
+#'  cluster locations. These new explanatory variables are also used for the
+#'  estimation of the linear model. Rows with NA's are omitted from the
+#'  computation.
 #'
-#'The user may choose to transform the response variable using
-#'a function, \code{transfy} previously to estimating the model. This function
-#'will be directly applied to the entire vector of the response variable, i.e.
-#'\code{transfy(response)}. This means your function needs to be able to take a
-#'vector as input. For transformations like \code{log}, \code{exp}, \code{sqrt}
-#'this will just give you an element-wise transformation. For more complex
-#'transformation, you may want to use \code{\link{sapply}} inside your function,
-#'to ensure element-wise transformation. This also applies to
-#'\code{transfy_inv}, and \code{welfare.function} which need to be able to take
-#'a matrix as input. In many cases a transformation like \code{transfy} could
-#'also be achieved by altering the specified model appropriately, but using
-#'\code{transfy} and \code{transfy_inv} is the recommended usage.
+#'  The user may choose to transform the response variable using a function,
+#'  \code{transfy}, previous to estimating the model. This function will be
+#'  directly applied to the entire vector of the response variable, i.e.
+#'  \code{transfy(response)}. This means the specified function needs to be able
+#'  to take a vector as input. For transformations like \code{log}, \code{exp},
+#'  \code{sqrt} this will just yield an element-wise transformation. For more
+#'  complex transformation, you may want to use \code{\link{sapply}} inside your
+#'  function, to ensure element-wise transformation. This also applies to
+#'  \code{transfy_inv}, and \code{welfare.function} which need to be able to
+#'  take a matrix as input. In many cases a transformation like \code{transfy}
+#'  could also be achieved by altering the specified model appropriately, but
+#'  using \code{transfy} and \code{transfy_inv} is the recommended usage.
 #'
 #'
-#'From the regression, location
-#'effects are calculated as the mean by location of the regression residuals.
-#'Individual random error terms are then obtained as the difference between the
-#'regression residuals and the location effects. The bootstrapped response
-#'variables are generated using three sources of randomness. The betas obtained
-#'from \code{lm()} are replaced by draws from a multivariate normal
-#'distribution. In addition random location effects and residuals are drawn with
-#'replacement. Internally the sample is a matrix, \code{bootstrap}, with
-#'the rows corresponding to bootstrap samples for one individual observation in
-#'the census data set. 
+#'  From the regression, location effects are calculated as the mean by location
+#'  of the regression residuals. Individual random error terms are then obtained
+#'  as the difference between the regression residuals and the location effects.
+#'  The bootstrapped response variables are generated using three sources of
+#'  randomness. The betas obtained from \code{lm()} are replaced by draws from a
+#'  multivariate normal distribution. In addition random location effects and
+#'  residuals are drawn with replacement. Internally the sample is a matrix,
+#'  \code{bootstrap}, with the rows corresponding to bootstrap samples for one
+#'  individual observation in the census data set.
 #'
-#'If \code{transfy_inv} was specified, the bootstrap sample
-#'is transformed back. This function will be directly applied to the matrix
-#'of bootstrap samples, i.e. \code{transfy_inv(bootstrap)}. 
+#'  If \code{transfy_inv} was specified, the bootstrap sample is transformed
+#'  back. This function will be directly applied to the matrix of bootstrap
+#'  samples, i.e. \code{transfy_inv(bootstrap)}.
 #'
-#'If a welfare
-#'function was specified it will be used to transform the bootstrap sample. It
-#'will be diretly applied to the matrix of bootstrap samples, i.e.
-#'\code{welfare.function(bootstrap)}. Bootstrap samples that belong to one 
-#'observation are arranged row-wise. 
+#'  If a welfare function was specified it will be used to transform the
+#'  bootstrap sample. It will be diretly applied to the matrix of bootstrap
+#'  samples, i.e. \code{welfare.function(bootstrap)}. Bootstrap samples that
+#'  belong to one observation are arranged row-wise.
 #'
-#'\code{cores} specifies the number of cores to use for the calculation. As
-#'parallelization is done in C++ and incurs little overhead this should in most
-#'cases be left to "auto".
+#'  \code{cores} specifies the number of cores to use for the calculation. As
+#'  parallelization is done in C++ and incurs little overhead this should in
+#'  most cases be left to "auto".
 #'
-#'To obtain reproducicble results, a \code{seed} can be specified. Simply
-#'running \code{set.seed()} in R does not work. providing a seed will not
-#'permanently alter the seed in R.
+#'  To obtain reproducicble results, a \code{seed} can be specified. Simply
+#'  running \code{set.seed()} in R does not work. providing a seed will not
+#'  permanently alter the seed in R.
 #'
 #'@return \code{ellsae} returns a list. By default, this list included a matrix
-#'with basic summary statistics as specified in \code{quantiles}, a vector with
-#'the means of the bootstrap samples for every observation, and the
-#'\code{lm}-object obtained from the linear model estimation. In addition, the
-#'user can request the full matrix of bootstrap samples, and an updated
-#'data.table of the survey and census data set with residuals and location
-#'effects and clustermeans added.
+#'  with basic summary statistics as specified in \code{quantiles}, a vector
+#'  with the means of the bootstrap samples for every observation, and the
+#'  \code{lm}-object obtained from the linear model estimation. In addition, the
+#'  user can request the full matrix of bootstrap samples, and an updated
+#'  data.table of the survey and census data set with residuals and location
+#'  effects and clustermeans added.
 #'
 #'
-#'@seealso If issues with RAM capacity occur one can also use 
-#'\code{\link[ELLsae:ellsae]{ellsae}} instead.Other small area estimation 
-#'methods can also be found in the package
+#'@seealso If issues with memory allocation occur one, can also use
+#'  \code{\link[ELLsae:ellsae_big]{ellsae_big}} instead.Other small area
+#'  estimation methods can also be found in the package
 #'\code{sae}.
 #'@keywords SAE, imputation
 #'@references Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003).
@@ -111,7 +110,7 @@
 #'@examples
 #'# Generate a sample survey and census data from the provided brazil data set
 #'brazil <-  ELLsae::brazil
-#'helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = F)
+#'helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = FALSE)
 #'helper <- sort(helper)
 #'survey <- brazil[helper,]
 #'census <- brazil[-helper,]

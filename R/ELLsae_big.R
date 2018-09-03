@@ -1,19 +1,19 @@
 #'@title ellsae_big
-#'@description The function \code{ellsae_big} implements the "ELL-method" method 
-#'for
-#'  small area estimation by Elbers, C., Lanjouw, J. O. and Lanjouw, P (2003)
-#'  used to impute a missing variable from a smaller survey dataset into a
-#'  census. The imputation is based on a linear model and bootstrap samples. 
-#'  \code{ellsae_big} provides the same functionality as 
-#'  \code{\link[ELLsae:ellsae]{ellsae}}, 
-#'  but trades a speed penalty for the ability to work with much larger 
-#'  data sets that are not restricted by RAM size. 
+#'@description The function \code{ellsae_big} implements the "ELL-method" method
+#'  for small area estimation by Elbers, C., Lanjouw, J. O. and Lanjouw, P
+#'  (2003) used to impute a missing variable from a smaller survey dataset into
+#'  a census. The imputation is based on a linear model and bootstrap samples.
+#'  \code{ellsae_big} provides the same functionality as
+#'  \code{\link[ELLsae:ellsae]{ellsae}}, but trades a potential speed penalty
+#'  for the ability to work with much larger data sets that are not restricted
+#'  by RAM size.
 #'
 #'@param model a model that describes the relationship between the response and
 #'  the explanatory variables. Input must be a linear model that can be
 #'  processed by \code{lm()}
 #'@param survey data set with the response variable of interest included.
-#'  Will be used to estimate the linear model
+#'  Will be used to estimate the linear model. Input will be coerced
+#'  to a data.table
 #'@param census dataset where the variable of interest is missing and shall
 #'  be imputed
 #'@param location_survey string with the name of the variable in the survey data
@@ -37,28 +37,28 @@
 #'@param clustermeans character vector with names of variables present in both
 #'  data sets. The mean of those variables in the census will be computed by
 #'  location and added to the survey data set before estimation of the linear
-#'  model. This may enhance precision of your estimates
+#'  model. This may enhance precision of ther estimates
 #'@param location_census string with the name of the variable in the survey data
 #'  set that contains information about the cluster (= location) of an
 #'  observation. Only needed if \code{clustermeans} are computed.
 #'@param save_boot logical value. TRUE saves the bootstrap sample as
-#'  BootstrapSampleELLsae-DATE.csv in your current working direktory.
+#'  BootstrapSampleELLsae-DATE.csv in the current working direktory.
 #'
-#'@details The function takes the the surveydata and uses the argument
+#'@details The function takes the survey data set and uses the argument
 #'\code{model} to estimate a linear model of the type \code{lm()}. In case the
 #'argument \code{clustermeans} is specified, means from the census data for the
 #'given variables are calculated and merged with the survey data by cluster
 #'locations. These new explanatory variables are also used for the estimation of
 #'the linear model. Rows with NA's are omitted from the computation.
 #'
-#'The user may choose to transform the response variable using
-#'a function, \code{transfy} previously to estimating the model. This function
-#'will be directly applied to the entire vector of the response variable, i.e.
-#'\code{transfy(response)}. This means your function needs to be able to take a
-#'vector as input. For transformations like \code{log}, \code{exp}, \code{sqrt}
-#'this will just give you an element-wise transformation. For more complex
-#'transformation, you may want to use \code{\link{sapply}} inside your function,
-#'to ensure element-wise transformation. This also applies to
+#'The user may choose to transform the response variable using a function,
+#'\code{transfy}, previous to estimating the model. This function will be
+#'directly applied to the entire vector of the response variable, i.e.
+#'\code{transfy(response)}. This means the specified function needs to be able
+#'to take a vector as input. For transformations like \code{log}, \code{exp},
+#'\code{sqrt} this will just yield an element-wise transformation. For more
+#'complex transformation, you may want to use \code{\link{sapply}} inside your
+#'function, to ensure element-wise transformation. This also applies to
 #'\code{transfy_inv}, and \code{welfare.function} which need to be able to take
 #'a matrix as input. In many cases a transformation like \code{transfy} could
 #'also be achieved by altering the specified model appropriately, but using
@@ -124,7 +124,7 @@
 #'@examples
 #'# Generate a sample survey and census data from the provided brazil data set
 #'brazil <-  ELLsae::brazil
-#'helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = F)
+#'helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = FALSE)
 #'helper <- sort(helper)
 #'survey <- brazil[helper,]
 #'census <- brazil[-helper,]
@@ -144,7 +144,7 @@
 #'                    quantiles = c(0, 0.25, 0.5, 0.75, 1),
 #'                    clustermeans = "age",
 #'                    location_census = "geo2_br",
-#'                    save_boot = F)
+#'                    save_boot = FALSE)
 #'@export
 
 

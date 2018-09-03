@@ -126,7 +126,7 @@ permanently alter the seed in R.
 \examples{
 # Generate a sample survey and census data from the provided brazil data set
 brazil <-  ELLsae::brazil
-helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = F)
+helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = FALSE)
 helper <- sort(helper)
 survey <- brazil[helper,]
 census <- brazil[-helper,]
@@ -160,7 +160,7 @@ of small area estimation methods for poverty mapping}. In: 17 (Mar. 2016),
 If issues with RAM capacity occur one can also use 
 \code{\link[ELLsae:ellsae]{ellsae}} instead.Other small area estimation 
 methods can also be found in the package
-\code{\link[sae:sae-package]{sae-package}}.
+\code{sae}.
 }
 \keyword{SAE,}
 \keyword{imputation}

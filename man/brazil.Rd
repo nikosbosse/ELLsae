@@ -33,21 +33,16 @@ The dataset contains 350,696 individual observations from the 2010 census in
 \url{http://microdata.worldbank.org/index.php/catalog/2078/study-description}.
 }
 \examples{
-# How to split the data for an example
-
-data(brazil)
-brazil <- brazil
+# one possibility to split the data
+brazil <- ELLsae::brazil
 
 # generate indexes for the rows to keep. order indexes to keep. 
-helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = F)
+helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = FALSE)
 helper <- sort(helper)
 
 #create survey and census set from the originial data using the indexes
 survey <- brazil[helper,]
 census <- brazil[-helper,]
-
-#remove the helper vector
-rm(list = "helper")
 
 
 }

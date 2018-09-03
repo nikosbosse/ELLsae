@@ -176,7 +176,7 @@ of small area estimation methods for poverty mapping}. In: 17 (Mar. 2016),
 }
 \seealso{
 Other small area estimation methods can also be found in the package
- \code{\link[sae:sae-package]{sae-package}}.
+ \code{sae}.
 }
 \keyword{SAE,}
 \keyword{imputation}

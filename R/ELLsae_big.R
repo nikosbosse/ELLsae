@@ -99,7 +99,7 @@
 #'and creates clusters according to the number of physical CPUs available.
 #'
 #'To obtain reproducicble results, a \code{seed} can be specified. Simply
-#'running \code{set.seed()} in R does not work. providing a seed will not
+#'running \code{set.seed()} in R does not work. Providing a seed will not
 #'permanently alter the seed in R.
 #'
 #'@return \code{ellsae_big} returns a list. By default, this list included a 
@@ -113,7 +113,6 @@
 #'a regular matrix.
 #'
 #'@seealso Other small area estimation methods can also be found in the package
-#'  \code{sae}.
 #'@keywords SAE, imputation
 #'@references Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003).
 #'\emph{Micro-Level Estimation of Poverty and Inequality}. In: Econometrica
@@ -226,7 +225,8 @@ ellsae_big <- function(model,
   }
   # check for NA and remove 
   if (any(is.na(surveydata[, c(..response, ..explanatories)]))) {
-    surveydata <- surveydata[complete.cases(surveydata[, c(..response, ..explanatories)]), ]
+    surveydata <- surveydata[complete.cases(
+      surveydata[, c(..response, ..explanatories)]), ]
     warning("your survey had missing values. Affected rows were removed.")
   }
   n_obs_survey <- nrow(surveydata)

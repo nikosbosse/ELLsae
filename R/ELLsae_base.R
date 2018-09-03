@@ -83,7 +83,7 @@
 #'  most cases be left to "auto".
 #'
 #'  To obtain reproducicble results, a \code{seed} can be specified. Simply
-#'  running \code{set.seed()} in R does not work. providing a seed will not
+#'  running \code{set.seed()} in R does not work. Providing a seed will not
 #'  permanently alter the seed in R.
 #'
 #'@return \code{ellsae} returns a list. By default, this list included a matrix
@@ -202,7 +202,8 @@ ellsae <- function(model,
   }
   # check for NA and remove 
   if (any(is.na(surveydata[, c(..response, ..explanatories)]))) {
-    surveydata <- surveydata[complete.cases(surveydata[, c(..response, ..explanatories)]), ]
+    surveydata <- surveydata[complete.cases(
+      surveydata[, c(..response, ..explanatories)]), ]
     warning("your survey had missing values. Affected rows were removed.")
   }
   n_obs_survey <- nrow(surveydata)

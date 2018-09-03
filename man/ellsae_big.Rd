@@ -142,6 +142,7 @@ running \code{set.seed()} in R does not work. Providing a seed will not
 permanently alter the seed in R.
 }
 \examples{
+\dontrun{
 # Generate a sample survey and census data from the provided brazil data set
 brazil <-  ELLsae::brazil
 helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = FALSE)
@@ -165,6 +166,7 @@ ELLsae::ellsae_big(model = model.example,
                    clustermeans = "age",
                    location_census = "geo2_br",
                    save_boot = FALSE)
+}
 }
 \references{
 Elbers, C., Lanjouw, J. O. and Lanjouw, P. (2003).

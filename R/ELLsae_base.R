@@ -108,6 +108,7 @@
 #'of small area estimation methods for poverty mapping}. In: 17 (Mar. 2016),
 #'41-66 and 156 and 158.
 #'@examples
+#'\dontrun{
 #'# Generate a sample survey and census data from the provided brazil data set
 #'brazil <-  ELLsae::brazil
 #'helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = FALSE)
@@ -130,6 +131,7 @@
 #'                clustermeans = "age",
 #'                location_census = "geo2_br",
 #'                save_boot = FALSE)
+#'}
 #'@export
 
 

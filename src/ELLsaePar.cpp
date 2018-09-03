@@ -12,16 +12,15 @@
 // [[Rcpp::export(.InfCensCpp)]]
 SEXP InfCensCpp(const int n_bootstrap,
                 const int n_obs_censusdata, 
-                const Eigen::Map<Eigen::VectorXd> locationeffects, 
-                const Eigen::Map<Eigen::VectorXd> residuals,
-                const Eigen::Map<Eigen::MatrixXd> X, 
-                const Eigen::Map<Eigen::MatrixXd> beta_sample, 
+                const Eigen::Map<Eigen::VectorXd> &locationeffects, 
+                const Eigen::Map<Eigen::VectorXd> &residuals,
+                const Eigen::Map<Eigen::MatrixXd> &X, 
+                const Eigen::Map<Eigen::MatrixXd> &beta_sample, 
                 int userseed, int ncores) 
 {
   
   // --------- create random sample of locations and of residuals --------- //
-  
-  // initialise random seeds 
+  // initialise RNG and seed 
   dqrng::xoshiro256plus gen;
   gen.seed(userseed);
   
@@ -36,30 +35,30 @@ SEXP InfCensCpp(const int n_bootstrap,
   // initialize and fill matrix for randam locations and residuals 
   Eigen::MatrixXd result(n_obs_censusdata, n_bootstrap);
   
-#ifdef _OPENMP
-  if (ncores == 999){
-    ncores = omp_get_max_threads() - 1;
-  }
-#endif
+  // set number of cores safely
+  #ifdef _OPENMP
+    if (ncores == 999){
+      ncores = omp_get_max_threads() - 1;
+    }
+  #endif
   
   
-#pragma omp parallel num_threads(ncores)
-{
-  dqrng::xoshiro256plus lgen(gen);      // make thread local copy of rng 
+  #pragma omp parallel num_threads(ncores)
+  {
+    dqrng::xoshiro256plus lgen(gen);      // make thread local copy of rng 
   
-#ifdef _OPENMP
-  lgen.jump(omp_get_thread_num() + 1);  // advance rng by 1 ... ncores jumps 
-#endif
+    #ifdef _OPENMP
+      lgen.jump(omp_get_thread_num() + 1);  // advance rng by 1 ... ncores jumps 
+    #endif
   
   
-#pragma omp for 
-  for (int i=0; i<n_obs_censusdata; ++i)
-    for (int j=0; j<n_bootstrap; j++)
-      result(i,j) = X.row(i)* beta_sample.col(j) + locationeffects[distrloc(lgen)] + residuals[distrres(lgen)];
-} 
+    #pragma omp for 
+      for (int i=0; i<n_obs_censusdata; ++i)
+        for (int j=0; j<n_bootstrap; j++)
+          result(i,j) = X.row(i)* beta_sample.col(j) + locationeffects[distrloc(lgen)] + residuals[distrres(lgen)];
+  } 
 
 return Rcpp::wrap(result);
-
 }
 
 
@@ -70,6 +69,8 @@ SEXP summaryParC(Eigen::Map<Eigen::MatrixXd> x,
   
   const int no_quantiles = quantiles.size();
   Eigen::MatrixXd result(nrow, no_quantiles + 3);
+  
+  // calculate the appropriate indices
   int indices[no_quantiles +1];
   indices[0] = -1;
   for (int k=0; k<no_quantiles; k++){
@@ -80,51 +81,51 @@ SEXP summaryParC(Eigen::Map<Eigen::MatrixXd> x,
     }
   }
   
-#ifdef _OPENMP
-  if (ncores == 999){
-    ncores = omp_get_max_threads() - 1;
-  }
-#endif
-  
-#pragma omp parallel num_threads(ncores)
-{
-#pragma omp for schedule(dynamic)
-  for (int i = 0; i < nrow; i++) {
-    Eigen::VectorXd v = x.row(i);
-    for (int q = 0; q < no_quantiles; ++q) {
-      
-      double total = 0;
-      double totalsquare = 0;
-      
-      for (int j = 0; j < ncol; j++){
-        total += x(i,j);
-        totalsquare += pow(x(i,j),2);
-      }
-      
-      double mean = total / ncol;
-      result(i,0) = mean;
-      double var = totalsquare / ncol - pow(mean,2);
-      result(i,1) = var;
-      result(i,2) = sqrt(var);
-      
-      std::nth_element(v.data() + indices[q] + 1,
-                       v.data() + indices[q+1],
-                                         v.data() + v.size());
-      result(i,q + 3) = v[indices[q+1]];
+  #ifdef _OPENMP
+    if (ncores == 999){
+      ncores = omp_get_max_threads() - 1;
     }
-  }
-}
-return Rcpp::wrap(result);
+  #endif
+  
+  #pragma omp parallel num_threads(ncores)
+  {
+    #pragma omp for schedule(dynamic)
+      for (int i = 0; i < nrow; i++) {
+        Eigen::VectorXd v = x.row(i);
+        for (int q = 0; q < no_quantiles; ++q) {
+      
+          double total = 0;
+          double totalsquare = 0;
+      
+          for (int j = 0; j < ncol; j++){
+            total += x(i,j);
+            totalsquare += pow(x(i,j),2);
+          }
+      
+          double mean = total / ncol;
+          result(i,0) = mean;
+          double var = totalsquare / ncol - pow(mean,2);
+          result(i,1) = var;
+          result(i,2) = sqrt(var);
+        
+          std::nth_element(v.data() + indices[q] + 1,
+                           v.data() + indices[q+1],
+                           v.data() + v.size());
+          result(i,q + 3) = v[indices[q+1]];
+        }
+      }
+    }
+  return Rcpp::wrap(result);
 }
 
 
 // [[Rcpp::export(.InfCensBigCpp)]]
 void InfCensBigCpp(Environment fbm, const int n_bootstrap,
                    const int n_obs_censusdata,
-                   const Eigen::Map<Eigen::VectorXd> locationeffects,
-                   const Eigen::Map<Eigen::VectorXd> residuals,
-                   const Eigen::Map<Eigen::MatrixXd> X,
-                   const Eigen::Map<Eigen::MatrixXd> beta_sample,
+                   const Eigen::Map<Eigen::VectorXd> &locationeffects,
+                   const Eigen::Map<Eigen::VectorXd> &residuals,
+                   const Eigen::Map<Eigen::MatrixXd> &X,
+                   const Eigen::Map<Eigen::MatrixXd> &beta_sample,
                    int userseed, int ncores)
 {
   
@@ -144,27 +145,27 @@ void InfCensBigCpp(Environment fbm, const int n_bootstrap,
   XPtr<FBM> xpMat = fbm["address"];
   BMAcc<double> macc(xpMat);
   
-  
   // initialize and fill matrix for randam locations and residuals
   Eigen::MatrixXd LocationEffectResiduals(n_obs_censusdata, n_bootstrap);
   
-#ifdef _OPENMP
-  if (ncores == 999){
-    ncores = omp_get_max_threads() - 1;
+  #ifdef _OPENMP
+    if (ncores == 999){
+      ncores = omp_get_max_threads() - 1;
+    }
+  #endif 
+  
+  #pragma omp parallel num_threads(ncores)
+  {
+    dqrng::xoshiro256plus lgen(gen);      // make thread local copy of rng
+    #ifdef _OPENMP
+      lgen.jump(omp_get_thread_num() + 1);  // advance rng by 1 ... ncores jumps
+    #endif
+  
+    #pragma omp for 
+      for (int i=0; i<n_obs_censusdata; ++i)
+        for (int j=0; j<n_bootstrap; j++)
+          macc(j,i) = X.row(i) * beta_sample.col(j) + locationeffects[distrloc(lgen)] + residuals[distrres(lgen)];
   }
-#endif 
-  
-#pragma omp parallel num_threads(ncores)
-{
-  dqrng::xoshiro256plus lgen(gen);      // make thread local copy of rng
-  lgen.jump(omp_get_thread_num() + 1);  // advance rng by 1 ... ncores jumps
-  
-#pragma omp for 
-  for (int i=0; i<n_obs_censusdata; ++i)
-    for (int j=0; j<n_bootstrap; j++)
-      macc(j,i) = X.row(i) * beta_sample.col(j) + locationeffects[distrloc(lgen)] + residuals[distrres(lgen)];
-}
-
 }
 
 
@@ -193,25 +194,25 @@ SEXP summaryBigParCt(Environment fbm,
     }
   }
   
-#ifdef _OPENMP
-  if (ncores == 999){
-    ncores = omp_get_max_threads() - 1;
-  }
-#endif
+  #ifdef _OPENMP
+    if (ncores == 999){
+      ncores = omp_get_max_threads() - 1;
+    }
+  #endif
   
   #pragma omp parallel num_threads(ncores)
   {
-  #pragma omp for schedule(dynamic)
-    for (int j = 0; j < ncol; j++){
-      for (int q = 0; q < no_quantiles; ++q) {
+    #pragma omp for schedule(dynamic)
+      for (int j = 0; j < ncol; j++){
+        for (int q = 0; q < no_quantiles; ++q) {
         
-        double total = 0;
-        double totalsquare = 0;
+          double total = 0;
+          double totalsquare = 0;
         
-        for (int i = 0; i < nrow; i++){
-          total += macc(i,j);
-          totalsquare += pow(macc(i,j),2);
-        }
+          for (int i = 0; i < nrow; i++){
+            total += macc(i,j);
+            totalsquare += pow(macc(i,j),2);
+          }
         
         double mean = total / nrow;
         result(j,0) = mean;

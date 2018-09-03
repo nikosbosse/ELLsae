@@ -30,14 +30,12 @@
 #'Demographic Census 2010. Rio de Janeiro, Brazil: 
 #'Brazilian Institute of Geography and Statistics (IBGE), 2012.
 #'@examples 
-#'# one possibility to split the data
+#'##### one possibility to split the data
 #'brazil <- ELLsae::brazil
-#'
-#'# generate indexes for the rows to keep. order indexes to keep. 
+#'#'# generate indexes for the rows to keep. order indexes to keep. 
 #'helper <- sample(x = 1:nrow(brazil), size = nrow(brazil)/5, replace = FALSE)
 #'helper <- sort(helper)
-#'
-#'#create survey and census set from the originial data using the indexes
+#'#'#create survey and census set from the originial data using the indexes
 #'survey <- brazil[helper,]
 #'census <- brazil[-helper,]
 #'

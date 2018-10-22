@@ -11,6 +11,7 @@
 #'@param model a model that describes the relationship between the response and
 #'  the explanatory variables. Input must be a linear model that can be
 #'  processed by \code{lm()}
+#'@param weights=NULL weights than can be used for fitting the model
 #'@param survey data set with the response variable of interest included.
 #'  Will be used to estimate the linear model. Input will be coerced
 #'  to a data.table
@@ -152,6 +153,7 @@
 
 
 ellsae_big <- function(model,
+                       weights = NULL,
                        survey,
                        census,
                        location_survey,
@@ -410,8 +412,8 @@ ellsae_big <- function(model,
       }
     
     # checks if all the locations in the survey are equal those in the census.
-    if (!all(unique(surveydata[, ..location_survey]) %in%
-             unique(censusdata[, ..location_census]))) {
+    if (!all(as.matrix(unique(surveydata[, ..location_survey])) %in%
+             as.matrix(unique(censusdata[, ..location_census])))) {
       stop(
         "All locations that appear in the survey data must also appear
         in the census data, there might also be missing values"
@@ -513,7 +515,7 @@ ellsae_big <- function(model,
   
   
   ##### fit a linear model based on the survey data set
-  model_fit <- lm(model, data = surveydata)
+  model_fit <- lm(model, data = surveydata, weights = weights)
   
   # add regression residuals to the surveydata
   surveydata[, regr_res := residuals(model_fit)]
@@ -556,7 +558,7 @@ ellsae_big <- function(model,
   .InfCensBigCpp(fbm = bootstrap, 
                  n_bootstrap = n_boot, n_obs_censusdata = n_obs_census,
                  locationeffects = location_effect, 
-                 residuals = residuals(model_fit),
+                 residuals = surveydata[, residuals],
                  X = X_census, beta_sample = betas, userseed = seed, ncores = cores_c)
   
   # back transfromation of previeously transformed responses

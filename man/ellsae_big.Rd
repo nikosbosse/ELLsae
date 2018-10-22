@@ -4,10 +4,11 @@
 \alias{ellsae_big}
 \title{ellsae_big}
 \usage{
-ellsae_big(model, survey, census, location_survey, n_boot = 250L, seed,
-  welfare.function, transfy, transfy_inv, output = "default",
-  cores_c = "auto", cores_r = 1, quantiles = c(0, 0.25, 0.5, 0.75,
-  1), clustermeans, location_census, save_boot = F)
+ellsae_big(model, weights = NULL, survey, census, location_survey,
+  n_boot = 250L, seed, welfare.function, transfy, transfy_inv,
+  output = "default", cores_c = "auto", cores_r = 1,
+  quantiles = c(0, 0.25, 0.5, 0.75, 1), clustermeans, location_census,
+  save_boot = F)
 }
 \arguments{
 \item{model}{a model that describes the relationship between the response and
@@ -60,6 +61,8 @@ observation. Only needed if \code{clustermeans} are computed.}
 
 \item{save_boot}{logical value. TRUE saves the bootstrap sample as
 BootstrapSampleELLsae-DATE.csv in the current working direktory.}
+
+\item{weights=NULL}{weights than can be used for fitting the model}
 }
 \value{
 \code{ellsae_big} returns a list. By default, this list included a 
